@@ -16,14 +16,5 @@
     "summary": "İnsanlık tarihini devrimler üzerinden ele alır.",
     "rating": 4,
     "date": "2025-02-10"
-  },
-  {
-    "id": "1001",
-    "name": "Test Kitabı",
-    "author": "Test Yazar",
-    "category": "Diğer",
-    "summary": "Elle ID girerek test edebilirsiniz.",
-    "rating": 3,
-    "date": "2025-06-01"
   }
 ]
