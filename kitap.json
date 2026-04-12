@@ -1,29 +1,29 @@
 [
-    {
-        "id": "9786053609902",
-        "name": "Suç ve Ceza",
-        "author": "Fyodor Dostoyevski",
-        "category": "Roman",
-        "summary": "Raskolnikov'un ahlaki ikilemler içinde yaşadığı ruhsal çöküşü anlatır.",
-        "rating": 5,
-        "date": "2025-01-15"
-    },
-    {
-        "id": "9786052691723",
-        "name": "Sapiens",
-        "author": "Yuval Noah Harari",
-        "category": "Bilim",
-        "summary": "İnsanlık tarihini devrimler üzerinden ele alır.",
-        "rating": 4,
-        "date": "2025-02-10"
-    },
-    {
-        "id": "1001",
-        "name": "Test Kitabı",
-        "author": "Test Yazar",
-        "category": "Diğer",
-        "summary": "Elle ID girerek test edebilirsiniz.",
-        "rating": 3,
-        "date": "2025-06-01"
-    }
+  {
+    "id": "9786053609902",
+    "name": "Suç ve Ceza2",
+    "author": "Fyodor Dostoyevski",
+    "category": "Roman",
+    "summary": "Raskolnikov'un ahlaki ikilemler içinde yaşadığı ruhsal çöküşü anlatır.",
+    "rating": 5,
+    "date": "2025-01-15"
+  },
+  {
+    "id": "9786052691723",
+    "name": "Sapiens",
+    "author": "Yuval Noah Harari",
+    "category": "Bilim",
+    "summary": "İnsanlık tarihini devrimler üzerinden ele alır.",
+    "rating": 4,
+    "date": "2025-02-10"
+  },
+  {
+    "id": "1001",
+    "name": "Test Kitabı",
+    "author": "Test Yazar",
+    "category": "Diğer",
+    "summary": "Elle ID girerek test edebilirsiniz.",
+    "rating": 3,
+    "date": "2025-06-01"
+  }
 ]
