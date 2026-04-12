@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1776018355584,
+    "name": "Suç ve Ceza",
+    "author": "Fyodor Dostoyevski",
+    "category": "Roman",
+    "summary": "Fakir bir hukuk öğrencisi olan Raskolnikov, ahlaki ikilemler ve vicdani sorgulamalar içinde bir cinayetin ardından yaşadığı ruhsal çöküşü anlatır. İnsan doğasının derinliklerine inen bu başyapıt, suç ve cezanın psikolojik boyutlarını magistral bir şekilde işler.",
+    "rating": 5,
+    "date": "2026-04-12T18:25:55.584Z"
+  },
+  {
+    "id": 1776018355585,
+    "name": "Sapiens: İnsan Türünün Kısa Tarihi",
+    "author": "Yuval Noah Harari",
+    "category": "Bilim",
+    "summary": "İnsanlık tarihini bilişsel, tarım ve bilimsel devrimler üzerinden ele alan bu kitap, Homo sapiens'in dünyaya nasıl hükmettiğini çarpıcı bir şekilde anlatır.",
+    "rating": 4,
+    "date": "2026-04-12T18:25:55.584Z"
+  },
+  {
+    "id": 1776018355586,
+    "name": "Sofie'nin Dünyası",
+    "author": "Jostein Gaarder",
+    "category": "Felsefe",
+    "summary": "14 yaşındaki Sofie'nin gizemli mektuplarla başlayan felsefe yolculuğu. Antik Yunan'dan modern düşünceye kadar felsefe tarihini akıcı bir roman formatında sunar.",
+    "rating": 4,
+    "date": "2026-04-12T18:25:55.584Z"
+  }
+]
