@@ -1,29 +1,29 @@
 [
     {
-        "id": 1,
+        "id": "9786053609902",
         "name": "Suç ve Ceza",
         "author": "Fyodor Dostoyevski",
         "category": "Roman",
-        "summary": "Fakir bir hukuk öğrencisi olan Raskolnikov'un ahlaki ikilemler içinde yaşadığı ruhsal çöküşü anlatır.",
+        "summary": "Raskolnikov'un ahlaki ikilemler içinde yaşadığı ruhsal çöküşü anlatır.",
         "rating": 5,
         "date": "2025-01-15"
     },
     {
-        "id": 2,
+        "id": "9786052691723",
         "name": "Sapiens",
         "author": "Yuval Noah Harari",
         "category": "Bilim",
-        "summary": "İnsanlık tarihini bilişsel, tarım ve bilimsel devrimler üzerinden ele alır.",
+        "summary": "İnsanlık tarihini devrimler üzerinden ele alır.",
         "rating": 4,
         "date": "2025-02-10"
     },
     {
-        "id": 3,
-        "name": "Sofie'nin Dünyası",
-        "author": "Jostein Gaarder",
-        "category": "Felsefe",
-        "summary": "14 yaşındaki Sofie'nin gizemli mektuplarla başlayan felsefe yolculuğu.",
-        "rating": 4,
-        "date": "2025-03-05"
+        "id": "1001",
+        "name": "Test Kitabı",
+        "author": "Test Yazar",
+        "category": "Diğer",
+        "summary": "Elle ID girerek test edebilirsiniz.",
+        "rating": 3,
+        "date": "2025-06-01"
     }
 ]
