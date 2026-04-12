@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📚 Kitap Yönetim Paneli</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         *{margin:0;padding:0;box-sizing:border-box}
@@ -22,7 +22,6 @@
         }
         body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g800);min-height:100vh}
 
-        /* ===== LOADING ===== */
         .loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--dark),#312e81,var(--primary));z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;transition:opacity .5s}
         .loading-screen.hidden{opacity:0;pointer-events:none}
         .loading-screen .li{font-size:64px;animation:bounce 1s infinite}
@@ -31,7 +30,6 @@
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
 
-        /* ===== TOP BAR ===== */
         .data-bar{position:fixed;top:0;left:280px;right:0;height:50px;background:#fff;border-bottom:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:900;box-shadow:var(--shadow)}
         .src-info{display:flex;align-items:center;gap:12px}
         .src-badge{display:flex;align-items:center;gap:6px;padding:4px 14px;border-radius:50px;font-size:12px;font-weight:600;background:rgba(16,185,129,.1);color:var(--success);white-space:nowrap}
@@ -43,14 +41,11 @@
         .bb{padding:7px 14px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .3s;font-family:'Inter',sans-serif}
         .bb-p{background:var(--primary);color:#fff}.bb-p:hover{background:var(--primary-dark)}
         .bb-o{background:#fff;color:var(--g600);border:1px solid var(--g300)}.bb-o:hover{border-color:var(--primary);color:var(--primary)}
-        .bb-w{background:var(--warning);color:#fff}.bb-w:hover{background:#d97706}
-        .bb-s{background:var(--success);color:#fff}.bb-s:hover{background:#059669}
         .bb.loading{opacity:.7;pointer-events:none}
 
-        /* ===== SIDEBAR ===== */
         .sidebar{position:fixed;left:0;top:0;width:280px;height:100vh;background:linear-gradient(180deg,var(--dark),#312e81);padding:30px 20px;z-index:1000;transition:transform .3s;overflow-y:auto}
         .s-logo{display:flex;align-items:center;gap:12px;color:#fff;margin-bottom:40px;padding:0 10px}
-        .s-logo .si{font-size:32px}
+        .s-logo .sli{font-size:32px}
         .s-logo h1{font-size:22px;font-weight:800;background:linear-gradient(135deg,#fff,var(--primary-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .s-menu{list-style:none;display:flex;flex-direction:column;gap:6px}
         .s-menu li a{display:flex;align-items:center;gap:14px;padding:14px 18px;color:rgba(255,255,255,.65);text-decoration:none;border-radius:12px;transition:all .3s;font-weight:500;font-size:15px}
@@ -63,7 +58,6 @@
         .si-item span{color:rgba(255,255,255,.7);font-size:14px}
         .si-item strong{color:#fff;font-size:18px;font-weight:700}
 
-        /* ===== MAIN ===== */
         .main{margin-left:280px;padding:80px 40px 30px;min-height:100vh}
         .tb{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:20px}
         .tb h2{font-size:28px;font-weight:800;color:var(--g900)}
@@ -86,17 +80,15 @@
         .btn-s{background:linear-gradient(135deg,var(--success),#059669);color:#fff}
         .btn-d{background:linear-gradient(135deg,var(--danger),#dc2626);color:#fff}
         .btn-w{background:linear-gradient(135deg,var(--warning),#d97706);color:#fff;box-shadow:0 4px 15px rgba(245,158,11,.4)}
-        .btn-w:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(245,158,11,.5)}
+        .btn-w:hover{transform:translateY(-2px)}
         .btn-o{background:#fff;color:var(--g600);border:2px solid var(--g200)}
         .btn-o:hover{border-color:var(--primary);color:var(--primary)}
         .btn-sm{padding:8px 16px;font-size:13px;border-radius:10px}
 
-        /* Filter */
         .fbar{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
         .fchip{padding:8px 20px;border-radius:50px;border:2px solid var(--g200);background:#fff;cursor:pointer;font-size:13px;font-weight:500;color:var(--g500);transition:all .3s;font-family:'Inter',sans-serif}
         .fchip:hover,.fchip.active{border-color:var(--primary);background:var(--primary);color:#fff}
 
-        /* Stats */
         .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:30px}
         .sc{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);display:flex;align-items:center;gap:16px;transition:transform .3s}
         .sc:hover{transform:translateY(-4px)}
@@ -105,7 +97,6 @@
         .sc .scf h4{font-size:13px;color:var(--g400);font-weight:500;margin-bottom:4px}
         .sc .scf .sn{font-size:28px;font-weight:800;color:var(--g900)}
 
-        /* Cards */
         .bg{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
         .bc{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:all .4s;cursor:pointer}
         .bc:hover{transform:translateY(-6px);box-shadow:var(--shadow-xl)}
@@ -123,21 +114,18 @@
         .cat-siir{background:rgba(236,72,153,.1);color:#ec4899}
         .cat-diger{background:rgba(107,114,128,.1);color:var(--g500)}
         .bcb{padding:0 24px 24px}
-        .bt{font-size:20px;font-weight:700;color:var(--g900);margin-bottom:6px;line-height:1.3}
-        .ba{font-size:14px;color:var(--primary);font-weight:600;margin-bottom:12px}
-        .bs{font-size:14px;color:var(--g500);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+        .bt2{font-size:20px;font-weight:700;color:var(--g900);margin-bottom:6px;line-height:1.3}
+        .ba2{font-size:14px;color:var(--primary);font-weight:600;margin-bottom:12px}
+        .bs2{font-size:14px;color:var(--g500);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
         .bcf{padding:16px 24px;border-top:1px solid var(--g100);display:flex;justify-content:space-between;align-items:center}
-        .bd{font-size:12px;color:var(--g400);display:flex;align-items:center;gap:6px}
-        .br{display:flex;gap:2px}
+        .bd2{font-size:12px;color:var(--g400);display:flex;align-items:center;gap:6px}
+        .br2{display:flex;gap:2px}
         .star{font-size:16px}.star.f{color:#f59e0b}.star.e{color:var(--g300)}
-
-        /* Admin Action Buttons on Card */
         .bc-actions{display:flex;gap:6px}
         .bc-actions button{width:36px;height:36px;border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .3s}
         .bae{background:rgba(99,102,241,.1);color:var(--primary)}.bae:hover{background:var(--primary);color:#fff}
         .bad{background:rgba(239,68,68,.1);color:var(--danger)}.bad:hover{background:var(--danger);color:#fff}
 
-        /* View */
         .vt{display:flex;background:#fff;border-radius:12px;border:2px solid var(--g200);overflow:hidden}
         .vt button{padding:10px 16px;border:none;background:none;cursor:pointer;font-size:18px;color:var(--g400);transition:all .3s}
         .vt button.active{background:var(--primary);color:#fff}
@@ -148,7 +136,6 @@
         .blf{flex:1}.blf h4{font-size:16px;font-weight:700;color:var(--g900);margin-bottom:4px}.blf .la{font-size:13px;color:var(--primary);font-weight:600}
         .bls{flex:2;font-size:13px;color:var(--g500);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
-        /* Modals */
         .mo{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(8px);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .3s}
         .mo.active{opacity:1;visibility:visible}
         .md{background:#fff;border-radius:24px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:scale(.9) translateY(20px);transition:all .3s;box-shadow:0 25px 50px -12px rgba(0,0,0,.25)}
@@ -157,8 +144,8 @@
         .mh h3{font-size:22px;font-weight:800;color:var(--g900)}
         .mc{width:40px;height:40px;border:none;background:var(--g100);border-radius:12px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g500);transition:all .3s}
         .mc:hover{background:var(--danger);color:#fff}
-        .mb{padding:28px 32px}
-        .mf{padding:0 32px 28px;display:flex;gap:12px;justify-content:flex-end}
+        .mb2{padding:28px 32px}
+        .mf2{padding:0 32px 28px;display:flex;gap:12px;justify-content:flex-end}
         .fg{margin-bottom:20px}
         .fg label{display:block;font-size:14px;font-weight:600;color:var(--g700);margin-bottom:8px}
         .fg input,.fg select,.fg textarea{width:100%;padding:14px 18px;border:2px solid var(--g200);border-radius:12px;font-size:14px;transition:all .3s;font-family:'Inter',sans-serif;color:var(--g800);background:var(--g50)}
@@ -168,7 +155,6 @@
         .fg .ri .sb{font-size:28px;background:none;border:none;cursor:pointer;color:var(--g300);transition:all .2s;padding:0}
         .fg .ri .sb.active,.fg .ri .sb:hover{color:#f59e0b;transform:scale(1.2)}
 
-        /* Scanner */
         .sco{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);z-index:5000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .3s}
         .sco.active{opacity:1;visibility:visible}
         .scc{background:#fff;border-radius:24px;padding:32px;max-width:500px;width:95%;text-align:center;transform:scale(.9);transition:all .3s}
@@ -176,11 +162,12 @@
         .sch{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
         .sch h3{font-size:20px;font-weight:800;color:var(--g900)}
         .svw{width:100%;border-radius:16px;overflow:hidden;background:#000;min-height:280px}
+        #scanner-reader{width:100%}
         #scanner-reader video{width:100%!important;border-radius:16px}
         .sst{margin-top:16px;font-size:14px;color:var(--g500);display:flex;align-items:center;justify-content:center;gap:8px}
         .sst .sdot{width:10px;height:10px;border-radius:50%;background:var(--danger);animation:sp 1s infinite}
         @keyframes sp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
-        .sres{margin-top:16px;padding:16px;border-radius:12px;font-weight:700;font-size:16px;display:none}
+        .sres{margin-top:16px;padding:16px;border-radius:12px;font-weight:700;font-size:15px;display:none}
         .sres.found{display:block;background:rgba(16,185,129,.1);color:var(--success);border:2px solid var(--success)}
         .sres.nf{display:block;background:rgba(239,68,68,.1);color:var(--danger);border:2px solid var(--danger)}
         .stip{margin-top:12px;font-size:12px;color:var(--g400);line-height:1.5}
@@ -191,62 +178,57 @@
         .mir input:focus{outline:none;border-color:var(--warning)}
         .mir button{padding:12px 20px;border:none;border-radius:10px;background:var(--warning);color:#fff;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
 
-        /* Confirm */
         .ctxt{font-size:16px;color:var(--g600);line-height:1.6;text-align:center;padding:20px 0}
         .ctxt strong{color:var(--g900)}
         .cico{text-align:center;font-size:60px;margin-bottom:10px}
-
-        /* Empty */
         .es{text-align:center;padding:80px 20px;grid-column:1/-1}
         .es .ei{font-size:80px;margin-bottom:20px}
         .es h3{font-size:24px;color:var(--g700);margin-bottom:10px}
         .es p{color:var(--g400);font-size:16px;margin-bottom:24px}
 
-        /* Toast */
         .tc{position:fixed;bottom:30px;right:30px;z-index:6000;display:flex;flex-direction:column;gap:10px}
-        .toast{padding:16px 24px;border-radius:14px;color:#fff;font-weight:600;font-size:14px;display:flex;align-items:center;gap:12px;min-width:300px;box-shadow:var(--shadow-xl);animation:si .4s ease,so .4s ease 2.6s;font-family:'Inter',sans-serif}
+        .toast{padding:16px 24px;border-radius:14px;color:#fff;font-weight:600;font-size:14px;display:flex;align-items:center;gap:12px;min-width:300px;box-shadow:var(--shadow-xl);animation:tsi .4s ease,tso .4s ease 2.6s;font-family:'Inter',sans-serif}
         .toast.success{background:linear-gradient(135deg,var(--success),#059669)}
         .toast.error{background:linear-gradient(135deg,var(--danger),#dc2626)}
         .toast.info{background:linear-gradient(135deg,var(--primary),var(--primary-dark))}
         .toast.warning{background:linear-gradient(135deg,var(--warning),#d97706)}
-        @keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-        @keyframes so{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
+        @keyframes tsi{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        @keyframes tso{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
 
-        /* Admin Login */
         .admin-login{max-width:500px;margin:0 auto}
-        .admin-login .al-card{background:#fff;border-radius:var(--radius);padding:40px;box-shadow:var(--shadow);text-align:center}
-        .admin-login .al-card .al-icon{font-size:64px;margin-bottom:16px}
-        .admin-login .al-card h3{font-size:24px;font-weight:800;margin-bottom:8px}
-        .admin-login .al-card p{color:var(--g500);font-size:14px;margin-bottom:24px;line-height:1.6}
+        .al-card{background:#fff;border-radius:var(--radius);padding:40px;box-shadow:var(--shadow);text-align:center}
+        .al-card .al-icon{font-size:64px;margin-bottom:16px}
+        .al-card h3{font-size:24px;font-weight:800;margin-bottom:8px}
+        .al-card>p{color:var(--g500);font-size:14px;margin-bottom:24px;line-height:1.6}
         .token-help{margin-top:20px;background:var(--g50);border-radius:12px;padding:20px;text-align:left}
         .token-help h4{font-size:14px;font-weight:700;margin-bottom:10px}
         .token-help ol{padding-left:20px;color:var(--g600);font-size:13px;line-height:2}
         .token-help code{background:var(--g200);padding:1px 6px;border-radius:4px;font-size:12px}
 
-        /* Info Card */
         .ic{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:24px;display:flex;align-items:center;gap:20px;border-left:4px solid var(--warning)}
         .ic .iicon{font-size:40px;flex-shrink:0}
         .ic .itxt h4{font-size:16px;font-weight:700;color:var(--g900);margin-bottom:4px}
         .ic .itxt p{font-size:13px;color:var(--g500);line-height:1.5}
 
-        /* Saving Indicator */
         .saving-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .3s}
         .saving-overlay.active{opacity:1;visibility:visible}
         .saving-card{background:#fff;border-radius:20px;padding:40px 50px;text-align:center;box-shadow:var(--shadow-xl)}
         .saving-card .sav-icon{font-size:48px;margin-bottom:16px;animation:spin 1s linear infinite}
         .saving-card p{font-size:16px;font-weight:600;color:var(--g700)}
 
-        /* Hamburger */
+        /* Debug Panel */
+        .debug-panel{background:var(--g900);border-radius:12px;padding:16px;margin-top:16px;display:none}
+        .debug-panel.show{display:block}
+        .debug-panel pre{color:#a5f3fc;font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto}
+
         .hamburger{display:none;position:fixed;top:60px;left:20px;z-index:1100;background:var(--primary);color:#fff;border:none;padding:12px;border-radius:12px;cursor:pointer;font-size:20px;box-shadow:var(--shadow-lg)}
         .page-section{display:none}
         .page-section.active{display:block;animation:fadeIn .4s ease}
         @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-        /* Responsive */
         @media(max-width:1024px){
             .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
-            .main{margin-left:0;padding:120px 20px 30px}
-            .data-bar{left:0}.hamburger{display:flex}
+            .main{margin-left:0;padding:120px 20px 30px}.data-bar{left:0}.hamburger{display:flex}
             .search-box input{width:200px}.id-box input{width:140px}
             .bg{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
         }
@@ -255,8 +237,7 @@
             .tba{width:100%;flex-wrap:wrap}
             .search-box input,.id-box input{width:100%}
             .search-box,.id-box{flex:1;min-width:0}
-            .bg{grid-template-columns:1fr}
-            .stats-grid{grid-template-columns:repeat(2,1fr)}
+            .bg{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}
             .fbar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:8px}
             .fchip{white-space:nowrap;flex-shrink:0}
             .data-bar{padding:0 12px}.src-url{display:none}.last-sync{display:none}
@@ -273,7 +254,7 @@
     <p id="loadingText">GitHub'dan veriler yükleniyor...</p>
 </div>
 
-<div class="data-bar" id="dataBar">
+<div class="data-bar">
     <div class="src-info">
         <div class="src-badge"><span class="pd"></span>GitHub JSON</div>
         <span class="src-url">📎 kitap.json</span>
@@ -288,13 +269,12 @@
 <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">☰</button>
 
 <aside class="sidebar" id="sidebar">
-    <div class="s-logo"><span class="si">📚</span><h1>KitapPanel</h1></div>
+    <div class="s-logo"><span class="sli">📚</span><h1>KitapPanel</h1></div>
     <ul class="s-menu">
         <li><a href="#" class="active" data-page="dashboard" onclick="goPage('dashboard',this)"><span class="mi">📊</span>Ana Panel</a></li>
         <li><a href="#" data-page="books" onclick="goPage('books',this)"><span class="mi">📖</span>Kitaplarım</a></li>
         <li><a href="#" data-page="scanner" onclick="goPage('scanner',this)"><span class="mi">📷</span>Barkod Tara</a></li>
         <li><a href="#" data-page="admin" onclick="goPage('admin',this)"><span class="mi">🔐</span>Admin Panel</a></li>
-        <li><a href="#" data-page="about" onclick="goPage('about',this)"><span class="mi">ℹ️</span>Hakkında</a></li>
     </ul>
     <div class="s-stats">
         <h3>Genel Bakış</h3>
@@ -304,9 +284,8 @@
     </div>
 </aside>
 
-<main class="main" id="mainContent">
+<main class="main">
 
-<!-- DASHBOARD -->
 <section class="page-section active" id="page-dashboard">
     <div class="tb"><h2>Hoş Geldiniz 👋</h2></div>
     <div class="stats-grid">
@@ -319,14 +298,13 @@
     <div class="bg" id="recentBooks"></div>
 </section>
 
-<!-- BOOKS -->
 <section class="page-section" id="page-books">
     <div class="tb">
         <h2>📖 <span>Kitaplarım</span></h2>
         <div class="tba">
             <div class="search-box"><span class="si2">🔍</span><input type="text" id="searchInput" placeholder="Kitap veya yazar ara..." oninput="renderBooks()"></div>
             <div class="id-box"><span class="idi">🏷️</span><input type="text" id="idSearchInput" placeholder="ID ile ara..." oninput="renderBooks()"></div>
-            <button class="btn btn-w" onclick="openScanner()">📷 Barkod Tara</button>
+            <button class="btn btn-w" onclick="openScanner()">📷 Barkod</button>
             <div class="vt">
                 <button class="active" id="gridBtn" onclick="setView('grid')">⊞</button>
                 <button id="listBtn" onclick="setView('list')">☰</button>
@@ -338,88 +316,59 @@
     <div class="bl" id="booksList" style="display:none"></div>
 </section>
 
-<!-- SCANNER -->
 <section class="page-section" id="page-scanner">
     <div class="tb"><h2>📷 <span>Barkod ile Kitap Ara</span></h2></div>
-    <div class="ic"><div class="iicon">📱</div><div class="itxt"><h4>Nasıl Çalışır?</h4><p>Kitabın barkodunu kameraya okutun. Barkod numarası JSON'daki <strong>id</strong> ile eşleştirilir.</p></div></div>
+    <div class="ic"><div class="iicon">📱</div><div class="itxt"><h4>Nasıl Çalışır?</h4><p>Barkodu kameraya okutun → ID eşleşirse kitap gösterilir.</p></div></div>
     <div style="display:flex;gap:20px;flex-wrap:wrap">
         <div style="flex:1;min-width:300px"><div style="background:#fff;border-radius:var(--radius);padding:32px;box-shadow:var(--shadow);text-align:center">
             <div style="font-size:64px;margin-bottom:16px">📷</div>
-            <h3 style="font-size:20px;font-weight:700;margin-bottom:12px">Kamerayı Aç</h3>
-            <p style="color:var(--g500);margin-bottom:24px;font-size:14px">Barkodu okutmak için kameranızı kullanın</p>
             <button class="btn btn-w" onclick="openScanner()" style="margin:0 auto;font-size:16px;padding:16px 32px">📷 Taramayı Başlat</button>
         </div></div>
         <div style="flex:1;min-width:300px"><div style="background:#fff;border-radius:var(--radius);padding:32px;box-shadow:var(--shadow)">
             <h3 style="font-size:20px;font-weight:700;margin-bottom:16px">🔢 Manuel ID Giriş</h3>
-            <p style="color:var(--g500);margin-bottom:20px;font-size:14px">Barkod numarasını elle yazın:</p>
-            <div class="mir"><input type="text" id="manualIdInput" placeholder="Barkod / ID..." onkeypress="if(event.key==='Enter')manualSearch()"><button onclick="manualSearch()">🔍 Ara</button></div>
+            <div class="mir"><input type="text" id="manualIdInput" placeholder="ID..." onkeypress="if(event.key==='Enter')manualSearch()"><button onclick="manualSearch()">🔍 Ara</button></div>
             <div id="manualResult" style="margin-top:16px"></div>
         </div></div>
     </div>
-    <div style="margin-top:30px"><h3 style="font-size:18px;font-weight:700;margin-bottom:16px">📋 Son Taramalar</h3><div id="scanHistory"><p style="color:var(--g400);font-size:14px">Henüz tarama yapılmadı.</p></div></div>
+    <div style="margin-top:30px"><h3 style="font-size:18px;font-weight:700;margin-bottom:16px">📋 Son Taramalar</h3><div id="scanHistory"><p style="color:var(--g400);font-size:14px">Henüz tarama yok.</p></div></div>
 </section>
 
-<!-- ADMIN -->
 <section class="page-section" id="page-admin">
     <div class="tb">
         <h2>🔐 <span>Admin Panel</span></h2>
         <div class="tba" id="adminActions" style="display:none">
-            <button class="btn btn-p" onclick="openAddModal()">➕ Yeni Kitap Ekle</button>
+            <button class="btn btn-p" onclick="openAddModal()">➕ Yeni Kitap</button>
             <button class="btn btn-o" onclick="adminLogout()">🚪 Çıkış</button>
         </div>
     </div>
-
-    <!-- Login -->
     <div id="adminLoginSection">
-        <div class="admin-login">
-            <div class="al-card">
-                <div class="al-icon">🔐</div>
-                <h3>Admin Girişi</h3>
-                <p>Kitap eklemek, düzenlemek ve silmek için GitHub Personal Access Token'ınızı girin.</p>
-                <div class="fg"><label>🔑 GitHub Token</label><input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx..."></div>
-                <div class="fg"><label>📧 GitHub Kullanıcı Adı</label><input type="text" id="githubUser" placeholder="kadirsener1" value="kadirsener1"></div>
-                <div class="fg"><label>📁 Repo Adı</label><input type="text" id="githubRepo" placeholder="kitap" value="kitap"></div>
-                <div class="fg"><label>📄 Dosya Yolu</label><input type="text" id="githubPath" placeholder="kitap.json" value="kitap.json"></div>
-                <button class="btn btn-p" onclick="adminLogin()" style="width:100%;justify-content:center;padding:16px">🔓 Giriş Yap</button>
-                <div class="token-help">
-                    <h4>🔑 Token Nasıl Alınır?</h4>
-                    <ol>
-                        <li>GitHub → <code>Settings</code> → <code>Developer settings</code></li>
-                        <li><code>Personal access tokens</code> → <code>Tokens (classic)</code></li>
-                        <li><code>Generate new token</code> tıklayın</li>
-                        <li><code>repo</code> iznini seçin</li>
-                        <li>Token'ı kopyalayıp buraya yapıştırın</li>
-                    </ol>
-                </div>
+        <div class="admin-login"><div class="al-card">
+            <div class="al-icon">🔐</div>
+            <h3>Admin Girişi</h3>
+            <p>GitHub Personal Access Token girin.</p>
+            <div class="fg"><label>🔑 GitHub Token</label><input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx..."></div>
+            <div class="fg"><label>📧 Kullanıcı Adı</label><input type="text" id="githubUser" placeholder="kadirsener1" value="kadirsener1"></div>
+            <div class="fg"><label>📁 Repo</label><input type="text" id="githubRepo" placeholder="kitap" value="kitap"></div>
+            <div class="fg"><label>📄 Dosya Yolu</label><input type="text" id="githubPath" placeholder="kitap.json" value="kitap.json"></div>
+            <div class="fg"><label>🌿 Branch</label><input type="text" id="githubBranch" placeholder="main" value="main"></div>
+            <button class="btn btn-p" onclick="adminLogin()" style="width:100%;justify-content:center;padding:16px">🔓 Giriş Yap</button>
+            <div class="token-help">
+                <h4>🔑 Token Nasıl Alınır?</h4>
+                <ol>
+                    <li>GitHub → <code>Settings</code> → <code>Developer settings</code></li>
+                    <li><code>Personal access tokens</code> → <code>Tokens (classic)</code></li>
+                    <li><code>Generate new token (classic)</code></li>
+                    <li><strong>Scope:</strong> <code>repo</code> işaretleyin (Full control)</li>
+                    <li>Token'ı kopyalayıp yapıştırın</li>
+                </ol>
             </div>
-        </div>
+            <div class="debug-panel" id="debugPanel"><pre id="debugLog"></pre></div>
+        </div></div>
     </div>
-
-    <!-- Admin Content -->
     <div id="adminContent" style="display:none">
-        <div class="ic"><div class="iicon">✅</div><div class="itxt"><h4>Admin Modu Aktif</h4><p>Kitap ekleyebilir, düzenleyebilir ve silebilirsiniz. Değişiklikler otomatik olarak GitHub'a kaydedilir.</p></div></div>
+        <div class="ic"><div class="iicon">✅</div><div class="itxt"><h4>Admin Modu Aktif</h4><p>Ekle / Düzenle / Sil → Otomatik GitHub'a kaydedilir.</p></div></div>
         <div class="bg" id="adminBooks"></div>
     </div>
-</section>
-
-<!-- ABOUT -->
-<section class="page-section" id="page-about">
-    <div class="tb"><h2>ℹ️ <span>Hakkında</span></h2></div>
-    <div class="ic"><div class="iicon">🐙</div><div class="itxt"><h4>GitHub JSON Kaynağı</h4><p>Veriler: <code style="background:var(--g100);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--primary)">kadirsener1/kitap/kitap.json</code></p></div></div>
-    <div style="background:#fff;border-radius:16px;padding:24px;box-shadow:var(--shadow);margin-top:20px">
-        <h3 style="margin-bottom:16px;font-size:18px">🏷️ JSON Formatı (Barkod ID)</h3>
-        <div style="background:var(--g900);border-radius:12px;padding:20px;overflow-x:auto">
-<pre style="color:#e2e8f0;font-size:13px;line-height:1.8;font-family:monospace;margin:0">[
-  {
-    "id": <span style="color:#f59e0b">"9786053609902"</span>,  ← Barkod numarası
-    "name": "Suç ve Ceza",
-    "author": "Dostoyevski",
-    "category": "Roman",
-    "summary": "Kitap özeti...",
-    "rating": 5,
-    "date": "2025-01-15"
-  }
-]</pre></div></div>
 </section>
 
 </main>
@@ -428,38 +377,22 @@
 <div class="mo" id="bookModal">
     <div class="md">
         <div class="mh"><h3 id="modalTitle">📕 Yeni Kitap</h3><button class="mc" onclick="closeBookModal()">✕</button></div>
-        <div class="mb">
+        <div class="mb2">
             <input type="hidden" id="editBookId">
-            <div class="fg">
-                <label>🏷️ Kitap ID / Barkod</label>
-                <div style="display:flex;gap:10px">
-                    <input type="text" id="fId" placeholder="Barkod numarasını girin veya taratın..." style="flex:1">
-                    <button class="btn btn-w btn-sm" onclick="openScannerForId()">📷</button>
-                </div>
+            <div class="fg"><label>🏷️ ID / Barkod</label>
+                <div style="display:flex;gap:10px"><input type="text" id="fId" placeholder="Barkod numarası..." style="flex:1"><button class="btn btn-w btn-sm" onclick="openScannerForId()">📷</button></div>
             </div>
             <div class="fg"><label>📕 Kitap Adı</label><input type="text" id="fName" placeholder="Kitap adı..."></div>
-            <div class="fg"><label>✍️ Yazar</label><input type="text" id="fAuthor" placeholder="Yazar adı..."></div>
+            <div class="fg"><label>✍️ Yazar</label><input type="text" id="fAuthor" placeholder="Yazar..."></div>
             <div class="fg"><label>📂 Kategori</label>
-                <select id="fCat">
-                    <option value="">Seçin...</option>
-                    <option value="Roman">📖 Roman</option><option value="Bilim">🔬 Bilim</option>
-                    <option value="Tarih">🏛️ Tarih</option><option value="Felsefe">🤔 Felsefe</option>
-                    <option value="Kişisel Gelişim">🌱 Kişisel Gelişim</option><option value="Teknoloji">💻 Teknoloji</option>
-                    <option value="Şiir">🎭 Şiir</option><option value="Diğer">📌 Diğer</option>
-                </select>
+                <select id="fCat"><option value="">Seçin...</option><option value="Roman">📖 Roman</option><option value="Bilim">🔬 Bilim</option><option value="Tarih">🏛️ Tarih</option><option value="Felsefe">🤔 Felsefe</option><option value="Kişisel Gelişim">🌱 Kişisel Gelişim</option><option value="Teknoloji">💻 Teknoloji</option><option value="Şiir">🎭 Şiir</option><option value="Diğer">📌 Diğer</option></select>
             </div>
             <div class="fg"><label>⭐ Puan</label>
-                <div class="ri" id="ratingInput">
-                    <button type="button" class="sb" onclick="setRating(1)">★</button>
-                    <button type="button" class="sb" onclick="setRating(2)">★</button>
-                    <button type="button" class="sb" onclick="setRating(3)">★</button>
-                    <button type="button" class="sb" onclick="setRating(4)">★</button>
-                    <button type="button" class="sb" onclick="setRating(5)">★</button>
-                </div>
+                <div class="ri" id="ratingInput"><button type="button" class="sb" onclick="setRating(1)">★</button><button type="button" class="sb" onclick="setRating(2)">★</button><button type="button" class="sb" onclick="setRating(3)">★</button><button type="button" class="sb" onclick="setRating(4)">★</button><button type="button" class="sb" onclick="setRating(5)">★</button></div>
             </div>
-            <div class="fg"><label>📝 Kısa Özet</label><textarea id="fSummary" placeholder="Kitabın kısa özeti..."></textarea></div>
+            <div class="fg"><label>📝 Özet</label><textarea id="fSummary" placeholder="Kısa özet..."></textarea></div>
         </div>
-        <div class="mf">
+        <div class="mf2">
             <button class="btn btn-o" onclick="closeBookModal()">İptal</button>
             <button class="btn btn-p" id="saveBtn" onclick="saveBook()">💾 Kaydet</button>
         </div>
@@ -468,15 +401,15 @@
 
 <!-- DETAIL MODAL -->
 <div class="mo" id="detailModal">
-    <div class="md"><div class="mh"><h3>📖 Kitap Detayı</h3><button class="mc" onclick="cDM()">✕</button></div><div class="mb" id="detailContent"></div></div>
+    <div class="md"><div class="mh"><h3>📖 Kitap Detayı</h3><button class="mc" onclick="cDM()">✕</button></div><div class="mb2" id="detailContent"></div></div>
 </div>
 
 <!-- CONFIRM MODAL -->
 <div class="mo" id="confirmModal">
     <div class="md" style="width:420px">
         <div class="mh"><h3>⚠️ Onay</h3><button class="mc" onclick="cCM()">✕</button></div>
-        <div class="mb"><div class="cico">🗑️</div><div class="ctxt" id="confirmText"></div></div>
-        <div class="mf"><button class="btn btn-o" onclick="cCM()">İptal</button><button class="btn btn-d" id="confirmBtn" onclick="doConfirm()">🗑️ Sil</button></div>
+        <div class="mb2"><div class="cico">🗑️</div><div class="ctxt" id="confirmText"></div></div>
+        <div class="mf2"><button class="btn btn-o" onclick="cCM()">İptal</button><button class="btn btn-d" onclick="doConfirm()">🗑️ Sil</button></div>
     </div>
 </div>
 
@@ -488,11 +421,11 @@
         <div class="sst" id="scannerStatus"><span class="sdot"></span>Barkod bekleniyor...</div>
         <div class="sres" id="scannerResult"></div>
         <div class="stip">💡 EAN-13, EAN-8, UPC, CODE-128, QR Code desteklenir.</div>
-        <div class="mis"><p>Kamera çalışmıyorsa:</p><div class="mir"><input type="text" id="scannerManualInput" placeholder="ID..." onkeypress="if(event.key==='Enter')scannerManualDo()"><button onclick="scannerManualDo()">🔍 Ara</button></div></div>
+        <div class="mis"><p>Kamera çalışmazsa:</p><div class="mir"><input type="text" id="scannerManualInput" placeholder="ID..." onkeypress="if(event.key==='Enter')scannerManualDo()"><button onclick="scannerManualDo()">🔍</button></div></div>
     </div>
 </div>
 
-<!-- SAVING OVERLAY -->
+<!-- SAVING -->
 <div class="saving-overlay" id="savingOverlay">
     <div class="saving-card"><div class="sav-icon">⏳</div><p id="savingText">GitHub'a kaydediliyor...</p></div>
 </div>
@@ -500,410 +433,570 @@
 <div class="tc" id="toastContainer"></div>
 
 <script>
-// ===== CONFIG =====
-const JSON_URL='https://raw.githubusercontent.com/kadirsener1/kitap/refs/heads/main/kitap.json';
-const GITHUB_API='https://api.github.com';
+// ========== CONFIG ==========
+const RAW_URL = 'https://raw.githubusercontent.com/kadirsener1/kitap/refs/heads/main/kitap.json';
+const GITHUB_API = 'https://api.github.com';
 
-// ===== STATE =====
-let books=[],currentFilter='all',currentView='grid',lastSyncTime=null;
-let modalRating=0,html5Scanner=null,scanHistory=[],confirmCb=null;
-let isAdmin=false,githubToken='',githubUser='',githubRepo='',githubPath='',fileSha='';
-let scannerMode='search'; // 'search' or 'id-input'
+// ========== STATE ==========
+let books = [];
+let currentFilter = 'all';
+let currentView = 'grid';
+let lastSyncTime = null;
+let modalRating = 0;
+let html5Scanner = null;
+let scanHistoryArr = [];
+let confirmCb = null;
+let isAdmin = false;
+let githubToken = '';
+let githubUser = 'kadirsener1';
+let githubRepo = 'kitap';
+let githubPath = 'kitap.json';
+let githubBranch = 'main';
+let fileSha = '';
+let scannerMode = 'search';
+let debugLogs = [];
 
-// ===== INIT =====
-document.addEventListener('DOMContentLoaded',()=>{
-    const saved=localStorage.getItem('github_config');
-    if(saved){try{const c=JSON.parse(saved);githubToken=c.token||'';githubUser=c.user||'';githubRepo=c.repo||'';githubPath=c.path||'';if(githubToken){document.getElementById('tokenInput').value=githubToken;document.getElementById('githubUser').value=githubUser;document.getElementById('githubRepo').value=githubRepo;document.getElementById('githubPath').value=githubPath;}}catch{}}
+// ========== INIT ==========
+document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('gh_cfg');
+    if (saved) {
+        try {
+            const c = JSON.parse(saved);
+            githubToken = c.token || '';
+            githubUser = c.user || 'kadirsener1';
+            githubRepo = c.repo || 'kitap';
+            githubPath = c.path || 'kitap.json';
+            githubBranch = c.branch || 'main';
+            document.getElementById('tokenInput').value = githubToken;
+            document.getElementById('githubUser').value = githubUser;
+            document.getElementById('githubRepo').value = githubRepo;
+            document.getElementById('githubPath').value = githubPath;
+            document.getElementById('githubBranch').value = githubBranch;
+        } catch(e) {}
+    }
     fetchBooks();
 });
 
-// ===== FETCH =====
-async function fetchBooks(){
-    const ls=document.getElementById('loadingScreen'),lt=document.getElementById('loadingText');
-    ls.classList.remove('hidden');lt.textContent='GitHub\'dan veriler yükleniyor...';
-    try{
-        const r=await fetch(JSON_URL+'?t='+Date.now());
-        if(!r.ok)throw new Error('HTTP '+r.status);
-        const t=await r.text();let d=JSON.parse(t);
-        if(Array.isArray(d))books=d;
-        else if(d&&typeof d==='object'){const a=Object.values(d).filter(v=>Array.isArray(v));books=a.length?a[0]:[d];}
-        else books=[];
-        books=books.map(b=>({...b,id:String(b.id)}));
-        lastSyncTime=new Date();updateSync();
-        lt.textContent=books.length+' kitap yüklendi!';
-        setTimeout(()=>ls.classList.add('hidden'),800);
-        renderAll();toast(books.length+' kitap yüklendi! 📚','success');
-        try{localStorage.setItem('books_cache',JSON.stringify(books));}catch{}
-    }catch(e){
-        lt.textContent='Hata!';setTimeout(()=>ls.classList.add('hidden'),1000);
-        const c=localStorage.getItem('books_cache');
-        if(c){books=JSON.parse(c);renderAll();toast('Önbellekten yüklendi.','info');}
-        else toast('Veriler yüklenemedi!','error');
+// ========== DEBUG ==========
+function dbg(msg) {
+    const ts = new Date().toLocaleTimeString();
+    debugLogs.push(`[${ts}] ${msg}`);
+    if (debugLogs.length > 50) debugLogs.shift();
+    const el = document.getElementById('debugLog');
+    if (el) el.textContent = debugLogs.join('\n');
+    console.log('[DBG]', msg);
+}
+
+// ========== FETCH ==========
+async function fetchBooks() {
+    const ls = document.getElementById('loadingScreen');
+    const lt = document.getElementById('loadingText');
+    ls.classList.remove('hidden');
+    lt.textContent = 'GitHub\'dan veriler yükleniyor...';
+
+    try {
+        const r = await fetch(RAW_URL + '?t=' + Date.now());
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const t = await r.text();
+        let d = JSON.parse(t);
+        if (Array.isArray(d)) books = d;
+        else if (d && typeof d === 'object') {
+            const a = Object.values(d).filter(v => Array.isArray(v));
+            books = a.length ? a[0] : [d];
+        } else books = [];
+        books = books.map(b => ({ ...b, id: String(b.id) }));
+        lastSyncTime = new Date();
+        updateSync();
+        lt.textContent = books.length + ' kitap yüklendi!';
+        setTimeout(() => ls.classList.add('hidden'), 800);
+        renderAll();
+        toast(books.length + ' kitap yüklendi! 📚', 'success');
+        try { localStorage.setItem('books_cache', JSON.stringify(books)); } catch {}
+    } catch (e) {
+        lt.textContent = 'Hata!';
+        setTimeout(() => ls.classList.add('hidden'), 1000);
+        const c = localStorage.getItem('books_cache');
+        if (c) { books = JSON.parse(c); renderAll(); toast('Önbellekten yüklendi.', 'info'); }
+        else toast('Yüklenemedi!', 'error');
     }
 }
-async function refreshData(){const b=document.getElementById('refreshBtn');b.classList.add('loading');await fetchBooks();setTimeout(()=>b.classList.remove('loading'),500);}
-function updateSync(){if(lastSyncTime)document.getElementById('lastSync').textContent='Son: '+lastSyncTime.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
 
-// ===== GITHUB API =====
-async function getFileSha(){
-    const r=await fetch(`${GITHUB_API}/repos/${githubUser}/${githubRepo}/contents/${githubPath}`,{headers:{'Authorization':'token '+githubToken,'Accept':'application/vnd.github.v3+json'}});
-    if(!r.ok)throw new Error('Dosya bilgisi alınamadı: '+r.status);
-    const d=await r.json();fileSha=d.sha;return d.sha;
+async function refreshData() {
+    const b = document.getElementById('refreshBtn');
+    b.classList.add('loading');
+    await fetchBooks();
+    setTimeout(() => b.classList.remove('loading'), 500);
 }
 
-async function pushToGithub(message){
-    document.getElementById('savingOverlay').classList.add('active');
-    document.getElementById('savingText').textContent='GitHub\'a kaydediliyor...';
-    try{
+function updateSync() {
+    if (lastSyncTime) document.getElementById('lastSync').textContent = 'Son: ' + lastSyncTime.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+// ========== GITHUB API ==========
+async function getFileSha() {
+    const url = `${GITHUB_API}/repos/${githubUser}/${githubRepo}/contents/${githubPath}?ref=${githubBranch}&t=${Date.now()}`;
+    dbg('GET SHA: ' + url);
+
+    const r = await fetch(url, {
+        headers: {
+            'Authorization': 'Bearer ' + githubToken,
+            'Accept': 'application/vnd.github.v3+json',
+            'X-GitHub-Api-Version': '2022-11-28'
+        }
+    });
+
+    dbg('SHA Response Status: ' + r.status);
+
+    if (!r.ok) {
+        const errText = await r.text();
+        dbg('SHA Error: ' + errText);
+        throw new Error('Dosya bilgisi alınamadı (HTTP ' + r.status + '): ' + errText);
+    }
+
+    const d = await r.json();
+    fileSha = d.sha;
+    dbg('SHA alındı: ' + fileSha);
+    return d.sha;
+}
+
+async function pushToGithub(commitMessage) {
+    const savingEl = document.getElementById('savingOverlay');
+    const savingText = document.getElementById('savingText');
+    savingEl.classList.add('active');
+    savingText.textContent = 'GitHub\'a kaydediliyor...';
+
+    try {
+        // 1. Güncel SHA al
+        savingText.textContent = 'Dosya bilgisi alınıyor...';
         await getFileSha();
-        const content=btoa(unescape(encodeURIComponent(JSON.stringify(books,null,2))));
-        const r=await fetch(`${GITHUB_API}/repos/${githubUser}/${githubRepo}/contents/${githubPath}`,{
-            method:'PUT',
-            headers:{'Authorization':'token '+githubToken,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-            body:JSON.stringify({message:message,content:content,sha:fileSha})
+
+        // 2. İçeriği Base64'e çevir
+        const jsonStr = JSON.stringify(books, null, 2);
+        const content = btoa(unescape(encodeURIComponent(jsonStr)));
+
+        // 3. PUT ile güncelle
+        const url = `${GITHUB_API}/repos/${githubUser}/${githubRepo}/contents/${githubPath}`;
+        dbg('PUT URL: ' + url);
+
+        const body = {
+            message: commitMessage,
+            content: content,
+            sha: fileSha,
+            branch: githubBranch
+        };
+
+        dbg('PUT Body: message=' + commitMessage + ', sha=' + fileSha + ', branch=' + githubBranch);
+
+        savingText.textContent = 'Dosya güncelleniyor...';
+
+        const r = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer ' + githubToken,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json',
+                'X-GitHub-Api-Version': '2022-11-28'
+            },
+            body: JSON.stringify(body)
         });
-        if(!r.ok){const e=await r.json();throw new Error(e.message||'GitHub API hatası');}
-        const d=await r.json();fileSha=d.content.sha;
-        document.getElementById('savingText').textContent='✅ Kaydedildi!';
-        setTimeout(()=>document.getElementById('savingOverlay').classList.remove('active'),1000);
-        toast('GitHub\'a kaydedildi! ✅','success');
-        try{localStorage.setItem('books_cache',JSON.stringify(books));}catch{}
+
+        dbg('PUT Response Status: ' + r.status);
+
+        const responseData = await r.json();
+
+        if (!r.ok) {
+            dbg('PUT Error: ' + JSON.stringify(responseData));
+            throw new Error(responseData.message || 'GitHub API hatası (HTTP ' + r.status + ')');
+        }
+
+        // Yeni SHA güncelle
+        fileSha = responseData.content.sha;
+        dbg('Yeni SHA: ' + fileSha);
+
+        savingText.textContent = '✅ Kaydedildi!';
+        setTimeout(() => savingEl.classList.remove('active'), 1200);
+        toast('GitHub\'a kaydedildi! ✅', 'success');
+        try { localStorage.setItem('books_cache', JSON.stringify(books)); } catch {}
         return true;
-    }catch(e){
-        document.getElementById('savingOverlay').classList.remove('active');
-        toast('GitHub kayıt hatası: '+e.message,'error');
-        console.error(e);return false;
+
+    } catch (e) {
+        savingEl.classList.remove('active');
+        dbg('PUSH HATA: ' + e.message);
+        toast('GitHub kayıt hatası: ' + e.message, 'error');
+        console.error('Push error:', e);
+        return false;
     }
 }
 
-// ===== ADMIN =====
-async function adminLogin(){
-    githubToken=document.getElementById('tokenInput').value.trim();
-    githubUser=document.getElementById('githubUser').value.trim();
-    githubRepo=document.getElementById('githubRepo').value.trim();
-    githubPath=document.getElementById('githubPath').value.trim();
-    if(!githubToken||!githubUser||!githubRepo||!githubPath){toast('Tüm alanları doldurun!','error');return;}
-    try{
-        toast('Doğrulanıyor...','info');
+// ========== ADMIN ==========
+async function adminLogin() {
+    githubToken = document.getElementById('tokenInput').value.trim();
+    githubUser = document.getElementById('githubUser').value.trim();
+    githubRepo = document.getElementById('githubRepo').value.trim();
+    githubPath = document.getElementById('githubPath').value.trim();
+    githubBranch = document.getElementById('githubBranch').value.trim() || 'main';
+
+    if (!githubToken) { toast('Token gerekli!', 'error'); return; }
+    if (!githubUser) { toast('Kullanıcı adı gerekli!', 'error'); return; }
+    if (!githubRepo) { toast('Repo adı gerekli!', 'error'); return; }
+    if (!githubPath) { toast('Dosya yolu gerekli!', 'error'); return; }
+
+    // Debug paneli göster
+    document.getElementById('debugPanel').classList.add('show');
+    debugLogs = [];
+
+    try {
+        dbg('Giriş deneniyor...');
+        dbg('User: ' + githubUser + ', Repo: ' + githubRepo + ', Path: ' + githubPath + ', Branch: ' + githubBranch);
+        dbg('Token: ' + githubToken.substring(0, 8) + '...');
+
+        // Önce token'ı test et
+        dbg('Token doğrulanıyor...');
+        const authTest = await fetch(`${GITHUB_API}/user`, {
+            headers: {
+                'Authorization': 'Bearer ' + githubToken,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        dbg('Auth test status: ' + authTest.status);
+
+        if (!authTest.ok) {
+            const errData = await authTest.text();
+            dbg('Auth test error: ' + errData);
+            throw new Error('Token geçersiz! (HTTP ' + authTest.status + ')');
+        }
+
+        const userData = await authTest.json();
+        dbg('Auth OK! User: ' + userData.login);
+
+        // SHA al
         await getFileSha();
-        isAdmin=true;
-        localStorage.setItem('github_config',JSON.stringify({token:githubToken,user:githubUser,repo:githubRepo,path:githubPath}));
-        document.getElementById('adminLoginSection').style.display='none';
-        document.getElementById('adminContent').style.display='block';
-        document.getElementById('adminActions').style.display='flex';
+
+        isAdmin = true;
+        localStorage.setItem('gh_cfg', JSON.stringify({
+            token: githubToken, user: githubUser,
+            repo: githubRepo, path: githubPath, branch: githubBranch
+        }));
+
+        document.getElementById('adminLoginSection').style.display = 'none';
+        document.getElementById('adminContent').style.display = 'block';
+        document.getElementById('adminActions').style.display = 'flex';
         renderAdminBooks();
-        toast('Admin girişi başarılı! 🔓','success');
-    }catch(e){toast('Giriş başarısız: '+e.message,'error');}
-}
-function adminLogout(){
-    isAdmin=false;githubToken='';fileSha='';
-    localStorage.removeItem('github_config');
-    document.getElementById('adminLoginSection').style.display='block';
-    document.getElementById('adminContent').style.display='none';
-    document.getElementById('adminActions').style.display='none';
-    toast('Çıkış yapıldı.','info');
+        toast('Admin girişi başarılı! 🔓 (' + userData.login + ')', 'success');
+
+    } catch (e) {
+        dbg('GİRİŞ HATASI: ' + e.message);
+        toast('Giriş hatası: ' + e.message, 'error');
+    }
 }
 
-// ===== RENDER =====
-function renderAll(){renderStats();renderBooks();renderRecent();renderFilters();updateSidebar();if(isAdmin)renderAdminBooks();}
-function renderStats(){
-    document.getElementById('dTotal').textContent=books.length;
-    const cats=[...new Set(books.map(b=>b.category).filter(Boolean))];
-    document.getElementById('dCats').textContent=cats.length;
-    document.getElementById('dAuth').textContent=[...new Set(books.map(b=>b.author).filter(Boolean))].length;
-    const rd=books.filter(b=>b.rating);
-    document.getElementById('dAvg').textContent=rd.length?(rd.reduce((s,b)=>s+(+b.rating||0),0)/rd.length).toFixed(1):'0';
+function adminLogout() {
+    isAdmin = false; githubToken = ''; fileSha = '';
+    localStorage.removeItem('gh_cfg');
+    document.getElementById('adminLoginSection').style.display = 'block';
+    document.getElementById('adminContent').style.display = 'none';
+    document.getElementById('adminActions').style.display = 'none';
+    document.getElementById('debugPanel').classList.remove('show');
+    toast('Çıkış yapıldı.', 'info');
 }
-function updateSidebar(){
-    document.getElementById('sT').textContent=books.length;
-    document.getElementById('sC').textContent=[...new Set(books.map(b=>b.category).filter(Boolean))].length;
-    const rd=books.filter(b=>b.rating);
-    document.getElementById('sA').textContent=rd.length?(rd.reduce((s,b)=>s+(+b.rating||0),0)/rd.length).toFixed(1):'0';
-}
-function renderFilters(){
-    const cats=[...new Set(books.map(b=>b.category).filter(Boolean))].sort();
-    const bar=document.getElementById('filterBar');
-    bar.innerHTML=`<button class="fchip ${currentFilter==='all'?'active':''}" onclick="filterCat('all',this)">Tümü (${books.length})</button>`;
-    cats.forEach(c=>{const n=books.filter(b=>b.category===c).length;bar.innerHTML+=`<button class="fchip ${currentFilter===c?'active':''}" onclick="filterCat('${esc(c)}',this)">${cEmoji(c)} ${eh(c)} (${n})</button>`;});
-}
-function cEmoji(c){return{'Roman':'📖','Bilim':'🔬','Tarih':'🏛️','Felsefe':'🤔','Kişisel Gelişim':'🌱','Teknoloji':'💻','Şiir':'🎭','Psikoloji':'🧠','Biyografi':'👤','Diğer':'📌'}[c]||'📌';}
-function cClass(c){return{'Roman':'cat-roman','Bilim':'cat-bilim','Tarih':'cat-tarih','Felsefe':'cat-felsefe','Kişisel Gelişim':'cat-kisisel','Teknoloji':'cat-teknoloji','Şiir':'cat-siir','Diğer':'cat-diger'}[c]||'cat-diger';}
 
-function getFiltered(){
-    const s=(document.getElementById('searchInput')?.value||'').toLowerCase();
-    const ids=(document.getElementById('idSearchInput')?.value||'').trim();
-    return books.filter(b=>{
-        const mc=currentFilter==='all'||b.category===currentFilter;
-        const ms=!s||(b.name||'').toLowerCase().includes(s)||(b.author||'').toLowerCase().includes(s)||(b.summary||'').toLowerCase().includes(s);
-        const mi=!ids||String(b.id).includes(ids);
-        return mc&&ms&&mi;
+// ========== RENDER ==========
+function renderAll() { renderStats(); renderBooks(); renderRecent(); renderFilters(); updateSidebar(); if (isAdmin) renderAdminBooks(); }
+
+function renderStats() {
+    document.getElementById('dTotal').textContent = books.length;
+    document.getElementById('dCats').textContent = [...new Set(books.map(b => b.category).filter(Boolean))].length;
+    document.getElementById('dAuth').textContent = [...new Set(books.map(b => b.author).filter(Boolean))].length;
+    const rd = books.filter(b => b.rating);
+    document.getElementById('dAvg').textContent = rd.length ? (rd.reduce((s, b) => s + (+b.rating || 0), 0) / rd.length).toFixed(1) : '0';
+}
+
+function updateSidebar() {
+    document.getElementById('sT').textContent = books.length;
+    document.getElementById('sC').textContent = [...new Set(books.map(b => b.category).filter(Boolean))].length;
+    const rd = books.filter(b => b.rating);
+    document.getElementById('sA').textContent = rd.length ? (rd.reduce((s, b) => s + (+b.rating || 0), 0) / rd.length).toFixed(1) : '0';
+}
+
+function renderFilters() {
+    const cats = [...new Set(books.map(b => b.category).filter(Boolean))].sort();
+    const bar = document.getElementById('filterBar');
+    bar.innerHTML = `<button class="fchip ${currentFilter === 'all' ? 'active' : ''}" onclick="filterCat('all',this)">Tümü (${books.length})</button>`;
+    cats.forEach(c => {
+        const n = books.filter(b => b.category === c).length;
+        bar.innerHTML += `<button class="fchip ${currentFilter === c ? 'active' : ''}" onclick="filterCat('${esc(c)}',this)">${cEmoji(c)} ${eh(c)} (${n})</button>`;
     });
 }
 
-function renderBooks(){
-    let fl=getFiltered();
-    const gc=document.getElementById('booksGrid'),lc=document.getElementById('booksList');
-    const hl=window._hlId||null;
-    if(!fl.length){const e='<div class="es"><div class="ei">🔍</div><h3>Kitap Bulunamadı</h3><p>Arama kriterlerinize uygun kitap yok.</p></div>';gc.innerHTML=e;lc.innerHTML=e;return;}
-    gc.innerHTML=fl.map(b=>cardHtml(b,hl,false)).join('');
-    lc.innerHTML=fl.map(b=>listHtml(b,hl,false)).join('');
-    if(hl){setTimeout(()=>{const el=document.getElementById('bc-'+hl);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},300);setTimeout(()=>{window._hlId=null;},5000);}
-}
-function renderRecent(){
-    const sorted=[...books].sort((a,b)=>(b.date?new Date(b.date):new Date(0))-(a.date?new Date(a.date):new Date(0))).slice(0,6);
-    const c=document.getElementById('recentBooks');
-    if(!sorted.length){c.innerHTML='<div class="es"><div class="ei">📚</div><h3>Henüz Kitap Yok</h3><p>JSON dosyanıza kitap ekleyin.</p></div>';return;}
-    c.innerHTML=sorted.map(b=>cardHtml(b,null,false)).join('');
-}
-function renderAdminBooks(){
-    const c=document.getElementById('adminBooks');
-    if(!books.length){c.innerHTML='<div class="es"><div class="ei">📚</div><h3>Kitap Yok</h3><p>İlk kitabınızı ekleyin.</p><button class="btn btn-p" onclick="openAddModal()">➕ Kitap Ekle</button></div>';return;}
-    c.innerHTML=books.map(b=>cardHtml(b,null,true)).join('');
+function cEmoji(c) { return { 'Roman': '📖', 'Bilim': '🔬', 'Tarih': '🏛️', 'Felsefe': '🤔', 'Kişisel Gelişim': '🌱', 'Teknoloji': '💻', 'Şiir': '🎭', 'Diğer': '📌' }[c] || '📌'; }
+function cClass(c) { return { 'Roman': 'cat-roman', 'Bilim': 'cat-bilim', 'Tarih': 'cat-tarih', 'Felsefe': 'cat-felsefe', 'Kişisel Gelişim': 'cat-kisisel', 'Teknoloji': 'cat-teknoloji', 'Şiir': 'cat-siir', 'Diğer': 'cat-diger' }[c] || 'cat-diger'; }
+
+function renderBooks() {
+    const s = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    const ids = (document.getElementById('idSearchInput')?.value || '').trim();
+    let fl = books.filter(b => {
+        return (currentFilter === 'all' || b.category === currentFilter)
+            && (!s || (b.name || '').toLowerCase().includes(s) || (b.author || '').toLowerCase().includes(s) || (b.summary || '').toLowerCase().includes(s))
+            && (!ids || String(b.id).includes(ids));
+    });
+    const gc = document.getElementById('booksGrid'), lc = document.getElementById('booksList');
+    const hl = window._hlId || null;
+    if (!fl.length) { const e = '<div class="es"><div class="ei">🔍</div><h3>Kitap Bulunamadı</h3></div>'; gc.innerHTML = e; lc.innerHTML = e; return; }
+    gc.innerHTML = fl.map(b => cardHtml(b, hl, false)).join('');
+    lc.innerHTML = fl.map(b => listHtml(b, hl, false)).join('');
+    if (hl) { setTimeout(() => { const el = document.getElementById('bc-' + hl); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); setTimeout(() => { window._hlId = null; }, 5000); }
 }
 
-function cardHtml(b,hl,admin){
-    return`<div class="bc ${hl&&String(b.id)===String(hl)?'hl':''}" id="bc-${esc(b.id)}" onclick="showDetail('${esc(b.id)}')">
+function renderRecent() {
+    const sorted = [...books].sort((a, b) => (b.date ? new Date(b.date) : new Date(0)) - (a.date ? new Date(a.date) : new Date(0))).slice(0, 6);
+    const c = document.getElementById('recentBooks');
+    if (!sorted.length) { c.innerHTML = '<div class="es"><div class="ei">📚</div><h3>Henüz Kitap Yok</h3></div>'; return; }
+    c.innerHTML = sorted.map(b => cardHtml(b, null, false)).join('');
+}
+
+function renderAdminBooks() {
+    const c = document.getElementById('adminBooks');
+    if (!books.length) { c.innerHTML = '<div class="es"><div class="ei">📚</div><h3>Kitap Yok</h3><button class="btn btn-p" onclick="openAddModal()">➕ Ekle</button></div>'; return; }
+    c.innerHTML = books.map(b => cardHtml(b, null, true)).join('');
+}
+
+function cardHtml(b, hl, admin) {
+    return `<div class="bc ${hl && String(b.id) === String(hl) ? 'hl' : ''}" id="bc-${esc(b.id)}" onclick="showDetail('${esc(b.id)}')">
         <div class="bch">
-            <span class="bcat ${cClass(b.category)}">${cEmoji(b.category)} ${eh(b.category||'Diğer')}</span>
+            <span class="bcat ${cClass(b.category)}">${cEmoji(b.category)} ${eh(b.category || 'Diğer')}</span>
             <div style="display:flex;align-items:center;gap:8px">
-                <span class="bid">ID: ${eh(b.id)}</span>
-                ${admin?`<div class="bc-actions" onclick="event.stopPropagation()">
-                    <button class="bae" onclick="editBook('${esc(b.id)}')" title="Düzenle">✏️</button>
-                    <button class="bad" onclick="deleteBook('${esc(b.id)}')" title="Sil">🗑️</button>
-                </div>`:''}
+                <span class="bid">ID:${eh(b.id)}</span>
+                ${admin ? `<div class="bc-actions" onclick="event.stopPropagation()">
+                    <button class="bae" onclick="editBook('${esc(b.id)}')">✏️</button>
+                    <button class="bad" onclick="deleteBook('${esc(b.id)}')">🗑️</button>
+                </div>` : ''}
             </div>
         </div>
-        <div class="bcb"><div class="bt">${eh(b.name||'İsimsiz')}</div><div class="ba">✍️ ${eh(b.author||'Bilinmiyor')}</div><div class="bs">${eh(b.summary||'')}</div></div>
-        <div class="bcf"><span class="bd">📅 ${fDate(b.date)}</span><div class="br">${stars(b.rating)}</div></div>
+        <div class="bcb"><div class="bt2">${eh(b.name || 'İsimsiz')}</div><div class="ba2">✍️ ${eh(b.author || '?')}</div><div class="bs2">${eh(b.summary || '')}</div></div>
+        <div class="bcf"><span class="bd2">📅 ${fDate(b.date)}</span><div class="br2">${stars(b.rating)}</div></div>
     </div>`;
 }
-function listHtml(b,hl,admin){
-    return`<div class="bli ${hl&&String(b.id)===String(hl)?'hl':''}" onclick="showDetail('${esc(b.id)}')">
-        <span class="bid">ID:${eh(b.id)}</span>
-        <span class="bcat ${cClass(b.category)}">${cEmoji(b.category)} ${eh(b.category||'Diğer')}</span>
-        <div class="blf"><h4>${eh(b.name||'İsimsiz')}</h4><span class="la">✍️ ${eh(b.author||'Bilinmiyor')}</span></div>
-        <div class="bls">${eh(b.summary||'')}</div>
-        <div class="br">${stars(b.rating)}</div>
-        ${admin?`<div class="bc-actions" onclick="event.stopPropagation()"><button class="bae" onclick="editBook('${esc(b.id)}')">✏️</button><button class="bad" onclick="deleteBook('${esc(b.id)}')">🗑️</button></div>`:''}
-    </div>`;
-}
-function stars(r){let h='';const n=+r||0;for(let i=1;i<=5;i++)h+=`<span class="star ${i<=n?'f':'e'}">★</span>`;return h;}
 
-// ===== BOOK CRUD =====
-function openAddModal(){
-    if(!isAdmin){toast('Önce admin girişi yapın!','error');goPage('admin',document.querySelector('[data-page="admin"]'));return;}
-    document.getElementById('modalTitle').textContent='📕 Yeni Kitap Ekle';
-    document.getElementById('editBookId').value='';
-    document.getElementById('fId').value='';
-    document.getElementById('fName').value='';
-    document.getElementById('fAuthor').value='';
-    document.getElementById('fCat').value='';
-    document.getElementById('fSummary').value='';
-    modalRating=0;updateRatingUI();
-    document.getElementById('saveBtn').textContent='💾 Kaydet';
+function listHtml(b, hl, admin) {
+    return `<div class="bli ${hl && String(b.id) === String(hl) ? 'hl' : ''}" onclick="showDetail('${esc(b.id)}')">
+        <span class="bid">ID:${eh(b.id)}</span>
+        <span class="bcat ${cClass(b.category)}">${cEmoji(b.category)} ${eh(b.category || 'Diğer')}</span>
+        <div class="blf"><h4>${eh(b.name || 'İsimsiz')}</h4><span class="la">✍️ ${eh(b.author || '?')}</span></div>
+        <div class="bls">${eh(b.summary || '')}</div>
+        <div class="br2">${stars(b.rating)}</div>
+        ${admin ? `<div class="bc-actions" onclick="event.stopPropagation()"><button class="bae" onclick="editBook('${esc(b.id)}')">✏️</button><button class="bad" onclick="deleteBook('${esc(b.id)}')">🗑️</button></div>` : ''}
+    </div>`;
+}
+
+function stars(r) { let h = ''; const n = +r || 0; for (let i = 1; i <= 5; i++) h += `<span class="star ${i <= n ? 'f' : 'e'}">★</span>`; return h; }
+
+// ========== CRUD ==========
+function openAddModal() {
+    if (!isAdmin) { toast('Önce admin girişi yapın!', 'error'); goPage('admin', document.querySelector('[data-page="admin"]')); return; }
+    document.getElementById('modalTitle').textContent = '📕 Yeni Kitap';
+    document.getElementById('editBookId').value = '';
+    document.getElementById('fId').value = '';
+    document.getElementById('fName').value = '';
+    document.getElementById('fAuthor').value = '';
+    document.getElementById('fCat').value = '';
+    document.getElementById('fSummary').value = '';
+    modalRating = 0; updateRatingUI();
+    document.getElementById('saveBtn').textContent = '💾 Kaydet';
     document.getElementById('bookModal').classList.add('active');
 }
-function editBook(id){
-    if(!isAdmin){toast('Önce admin girişi yapın!','error');return;}
-    const b=findById(id);if(!b)return;
-    document.getElementById('modalTitle').textContent='✏️ Kitabı Düzenle';
-    document.getElementById('editBookId').value=b.id;
-    document.getElementById('fId').value=b.id;
-    document.getElementById('fName').value=b.name||'';
-    document.getElementById('fAuthor').value=b.author||'';
-    document.getElementById('fCat').value=b.category||'';
-    document.getElementById('fSummary').value=b.summary||'';
-    modalRating=+b.rating||0;updateRatingUI();
-    document.getElementById('saveBtn').textContent='💾 Güncelle';
+
+function editBook(id) {
+    if (!isAdmin) { toast('Admin girişi yapın!', 'error'); return; }
+    const b = findById(id); if (!b) return;
+    document.getElementById('modalTitle').textContent = '✏️ Düzenle';
+    document.getElementById('editBookId').value = b.id;
+    document.getElementById('fId').value = b.id;
+    document.getElementById('fName').value = b.name || '';
+    document.getElementById('fAuthor').value = b.author || '';
+    document.getElementById('fCat').value = b.category || '';
+    document.getElementById('fSummary').value = b.summary || '';
+    modalRating = +b.rating || 0; updateRatingUI();
+    document.getElementById('saveBtn').textContent = '💾 Güncelle';
     document.getElementById('bookModal').classList.add('active');
 }
-function deleteBook(id){
-    if(!isAdmin){toast('Önce admin girişi yapın!','error');return;}
-    const b=findById(id);if(!b)return;
-    document.getElementById('confirmText').innerHTML=`<strong>"${eh(b.name)}"</strong> kitabını silmek istediğinize emin misiniz?<br><br>Bu işlem GitHub'a kaydedilecek.`;
-    confirmCb=async()=>{
-        books=books.filter(x=>String(x.id)!==String(id));
-        const ok=await pushToGithub(`🗑️ Silindi: ${b.name}`);
-        if(ok)renderAll();else{books.push(b);renderAll();}
+
+function deleteBook(id) {
+    if (!isAdmin) { toast('Admin girişi yapın!', 'error'); return; }
+    const b = findById(id); if (!b) return;
+    document.getElementById('confirmText').innerHTML = `<strong>"${eh(b.name)}"</strong> silinecek.<br>Bu işlem GitHub'a commit edilecek.`;
+    confirmCb = async () => {
+        const backup = [...books];
+        books = books.filter(x => String(x.id) !== String(id));
+        const ok = await pushToGithub('🗑️ Silindi: ' + b.name);
+        if (ok) { renderAll(); }
+        else { books = backup; renderAll(); }
     };
     document.getElementById('confirmModal').classList.add('active');
 }
-async function saveBook(){
-    const editId=document.getElementById('editBookId').value;
-    const id=document.getElementById('fId').value.trim();
-    const name=document.getElementById('fName').value.trim();
-    const author=document.getElementById('fAuthor').value.trim();
-    const cat=document.getElementById('fCat').value;
-    const summary=document.getElementById('fSummary').value.trim();
-    if(!id){toast('ID / Barkod gerekli!','error');return;}
-    if(!name){toast('Kitap adı gerekli!','error');return;}
-    if(!author){toast('Yazar gerekli!','error');return;}
-    if(!cat){toast('Kategori seçin!','error');return;}
-    if(!summary){toast('Özet yazın!','error');return;}
 
-    if(editId){
-        const b=findById(editId);
-        if(b){
-            // Eski id farklıysa ve yeni id zaten varsa kontrol
-            if(String(id)!==String(editId)&&findById(id)){toast('Bu ID zaten kullanılıyor!','error');return;}
-            b.id=String(id);b.name=name;b.author=author;b.category=cat;b.summary=summary;b.rating=modalRating;
-            closeBookModal();
-            const ok=await pushToGithub(`✏️ Güncellendi: ${name}`);
-            if(ok)renderAll();
-        }
-    }else{
-        if(findById(id)){toast('Bu ID zaten mevcut!','error');return;}
-        books.push({id:String(id),name,author,category:cat,summary,rating:modalRating,date:new Date().toISOString().slice(0,10)});
+async function saveBook() {
+    const editId = document.getElementById('editBookId').value;
+    const id = document.getElementById('fId').value.trim();
+    const name = document.getElementById('fName').value.trim();
+    const author = document.getElementById('fAuthor').value.trim();
+    const cat = document.getElementById('fCat').value;
+    const summary = document.getElementById('fSummary').value.trim();
+
+    if (!id) { toast('ID gerekli!', 'error'); return; }
+    if (!name) { toast('Kitap adı gerekli!', 'error'); return; }
+    if (!author) { toast('Yazar gerekli!', 'error'); return; }
+    if (!cat) { toast('Kategori seçin!', 'error'); return; }
+    if (!summary) { toast('Özet yazın!', 'error'); return; }
+
+    const backup = [...books];
+
+    if (editId) {
+        const idx = books.findIndex(b => String(b.id) === String(editId));
+        if (idx === -1) { toast('Kitap bulunamadı!', 'error'); return; }
+        if (String(id) !== String(editId) && findById(id)) { toast('Bu ID zaten var!', 'error'); return; }
+        books[idx] = { ...books[idx], id: String(id), name, author, category: cat, summary, rating: modalRating };
         closeBookModal();
-        const ok=await pushToGithub(`➕ Eklendi: ${name}`);
-        if(ok)renderAll();else{books.pop();renderAll();}
+        const ok = await pushToGithub('✏️ Güncellendi: ' + name);
+        if (ok) renderAll(); else { books = backup; renderAll(); }
+    } else {
+        if (findById(id)) { toast('Bu ID zaten mevcut!', 'error'); return; }
+        books.push({ id: String(id), name, author, category: cat, summary, rating: modalRating, date: new Date().toISOString().slice(0, 10) });
+        closeBookModal();
+        const ok = await pushToGithub('➕ Eklendi: ' + name);
+        if (ok) renderAll(); else { books = backup; renderAll(); }
     }
 }
-function closeBookModal(){document.getElementById('bookModal').classList.remove('active');}
-function setRating(r){modalRating=r;updateRatingUI();}
-function updateRatingUI(){document.querySelectorAll('#ratingInput .sb').forEach((s,i)=>s.classList.toggle('active',i<modalRating));}
 
-// ===== SCANNER =====
-function openScanner(){scannerMode='search';startScanner();}
-function openScannerForId(){scannerMode='id-input';startScanner();}
+function closeBookModal() { document.getElementById('bookModal').classList.remove('active'); }
+function setRating(r) { modalRating = r; updateRatingUI(); }
+function updateRatingUI() { document.querySelectorAll('#ratingInput .sb').forEach((s, i) => s.classList.toggle('active', i < modalRating)); }
 
-function startScanner(){
+// ========== SCANNER ==========
+function openScanner() { scannerMode = 'search'; startScanner(); }
+function openScannerForId() { scannerMode = 'id-input'; startScanner(); }
+
+function startScanner() {
     document.getElementById('scannerOverlay').classList.add('active');
-    document.getElementById('scannerResult').className='sres';
-    document.getElementById('scannerResult').innerHTML='';
-    document.getElementById('scannerStatus').innerHTML='<span class="sdot"></span>Kamera başlatılıyor...';
-    if(html5Scanner){try{html5Scanner.clear();}catch{}}
-    html5Scanner=new Html5Qrcode("scanner-reader");
-    const cfg={fps:15,qrbox:{width:280,height:150},formatsToSupport:[
-        Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,
-        Html5QrcodeSupportedFormats.UPC_A,Html5QrcodeSupportedFormats.UPC_E,
-        Html5QrcodeSupportedFormats.CODE_128,Html5QrcodeSupportedFormats.CODE_39,
-        Html5QrcodeSupportedFormats.QR_CODE]};
-    html5Scanner.start({facingMode:"environment"},cfg,
-        (code)=>onBarcode(code),
-        ()=>{}
-    ).then(()=>{document.getElementById('scannerStatus').innerHTML='<span class="sdot"></span>Barkod bekleniyor...';})
-    .catch(()=>{document.getElementById('scannerStatus').innerHTML='⚠️ Kamera açılamadı. Manuel girin.';});
+    document.getElementById('scannerResult').className = 'sres';
+    document.getElementById('scannerResult').innerHTML = '';
+    document.getElementById('scannerStatus').innerHTML = '<span class="sdot"></span>Kamera başlatılıyor...';
+    if (html5Scanner) { try { html5Scanner.clear(); } catch {} }
+    html5Scanner = new Html5Qrcode("scanner-reader");
+    html5Scanner.start({ facingMode: "environment" },
+        { fps: 15, qrbox: { width: 280, height: 150 }, formatsToSupport: [0, 1, 2, 3, 4, 5, 6, 7] },
+        code => onBarcode(code), () => {}
+    ).then(() => { document.getElementById('scannerStatus').innerHTML = '<span class="sdot"></span>Barkod bekleniyor...'; })
+        .catch(() => { document.getElementById('scannerStatus').innerHTML = '⚠️ Kamera açılamadı.'; });
 }
-function onBarcode(code){
-    const c=String(code).trim();
-    if(navigator.vibrate)navigator.vibrate(200);
-    try{html5Scanner.pause(true);}catch{}
 
-    if(scannerMode==='id-input'){
-        document.getElementById('fId').value=c;
-        const res=document.getElementById('scannerResult');
-        res.className='sres found';res.innerHTML='✅ Barkod okundu: <strong>'+eh(c)+'</strong>';
-        toast('Barkod okundu: '+c,'success');
-        setTimeout(()=>closeScanner(),1200);
+function onBarcode(code) {
+    const c = String(code).trim();
+    if (navigator.vibrate) navigator.vibrate(200);
+    try { html5Scanner.pause(true); } catch {}
+    if (scannerMode === 'id-input') {
+        document.getElementById('fId').value = c;
+        const res = document.getElementById('scannerResult');
+        res.className = 'sres found'; res.innerHTML = '✅ Barkod okundu: <strong>' + eh(c) + '</strong>';
+        toast('Barkod: ' + c, 'success');
+        setTimeout(() => closeScanner(), 1200);
         return;
     }
-
     addScanHistory(c);
-    const b=findById(c);
-    const res=document.getElementById('scannerResult');
-    if(b){
-        res.className='sres found';res.innerHTML='✅ Bulundu! <strong>"'+eh(b.name)+'"</strong>';
-        toast('📖 "'+b.name+'" bulundu!','success');
-        setTimeout(()=>{closeScanner();hlShow(c);},1500);
-    }else{
-        res.className='sres nf';res.innerHTML='❌ ID <strong>"'+eh(c)+'"</strong> bulunamadı.';
-        toast('Barkod '+c+' bulunamadı.','warning');
-        setTimeout(()=>{res.className='sres';res.innerHTML='';try{html5Scanner.resume();}catch{}},2500);
+    const b = findById(c);
+    const res = document.getElementById('scannerResult');
+    if (b) {
+        res.className = 'sres found'; res.innerHTML = '✅ "' + eh(b.name) + '" bulundu!';
+        toast('📖 "' + b.name + '" bulundu!', 'success');
+        setTimeout(() => { closeScanner(); hlShow(c); }, 1500);
+    } else {
+        res.className = 'sres nf'; res.innerHTML = '❌ ID "' + eh(c) + '" bulunamadı.';
+        toast(c + ' bulunamadı.', 'warning');
+        setTimeout(() => { res.className = 'sres'; res.innerHTML = ''; try { html5Scanner.resume(); } catch {} }, 2500);
     }
 }
-function closeScanner(){document.getElementById('scannerOverlay').classList.remove('active');if(html5Scanner){try{html5Scanner.stop();}catch{}}}
-function scannerManualDo(){
-    const v=document.getElementById('scannerManualInput').value.trim();
-    if(!v){toast('ID girin!','error');return;}
-    onBarcode(v);
-}
-function manualSearch(){
-    const v=document.getElementById('manualIdInput').value.trim();
-    if(!v){toast('ID girin!','error');return;}
+
+function closeScanner() { document.getElementById('scannerOverlay').classList.remove('active'); if (html5Scanner) { try { html5Scanner.stop(); } catch {} } }
+function scannerManualDo() { const v = document.getElementById('scannerManualInput').value.trim(); if (!v) return; onBarcode(v); }
+
+function manualSearch() {
+    const v = document.getElementById('manualIdInput').value.trim(); if (!v) return;
     addScanHistory(v);
-    const b=findById(v);const el=document.getElementById('manualResult');
-    if(b){
-        el.innerHTML=`<div style="padding:16px;border-radius:12px;background:rgba(16,185,129,.1);border:2px solid var(--success);margin-top:10px">
-            <div style="font-weight:700;color:var(--success);margin-bottom:8px">✅ Kitap Bulundu!</div>
-            <div style="font-weight:700;font-size:18px;color:var(--g900)">${eh(b.name)}</div>
-            <div style="color:var(--primary);font-weight:600;margin:4px 0">✍️ ${eh(b.author)}</div>
-            <div style="color:var(--g500);font-size:13px;margin-bottom:12px">${eh(b.category)} • ID: ${eh(b.id)}</div>
-            <button class="btn btn-p" onclick="hlShow('${esc(b.id)}')" style="width:100%;justify-content:center">📖 Kitabı Göster</button>
+    const b = findById(v); const el = document.getElementById('manualResult');
+    if (b) {
+        el.innerHTML = `<div style="padding:16px;border-radius:12px;background:rgba(16,185,129,.1);border:2px solid var(--success)">
+            <div style="font-weight:700;color:var(--success)">✅ Bulundu!</div>
+            <div style="font-weight:700;font-size:18px;color:var(--g900);margin-top:8px">${eh(b.name)}</div>
+            <div style="color:var(--primary);font-weight:600">✍️ ${eh(b.author)}</div>
+            <button class="btn btn-p" onclick="hlShow('${esc(b.id)}')" style="width:100%;justify-content:center;margin-top:12px">📖 Göster</button>
         </div>`;
-        toast('"'+b.name+'" bulundu!','success');
-    }else{
-        el.innerHTML=`<div style="padding:16px;border-radius:12px;background:rgba(239,68,68,.1);border:2px solid var(--danger);margin-top:10px">
-            <div style="font-weight:700;color:var(--danger)">❌ Bulunamadı</div>
-            <div style="color:var(--g500);font-size:13px;margin-top:4px">ID "${eh(v)}" ile eşleşen kayıt yok.</div>
-        </div>`;
-        toast('ID "'+v+'" bulunamadı.','warning');
+    } else {
+        el.innerHTML = `<div style="padding:16px;border-radius:12px;background:rgba(239,68,68,.1);border:2px solid var(--danger)"><div style="font-weight:700;color:var(--danger)">❌ Bulunamadı</div></div>`;
     }
 }
-function addScanHistory(c){
-    const t=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    const b=findById(c);
-    scanHistory.unshift({code:c,time:t,found:!!b,name:b?.name||null});
-    if(scanHistory.length>20)scanHistory.pop();
+
+function addScanHistory(c) {
+    const t = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const b = findById(c);
+    scanHistoryArr.unshift({ code: c, time: t, found: !!b, name: b?.name });
+    if (scanHistoryArr.length > 20) scanHistoryArr.pop();
     renderScanHistory();
 }
-function renderScanHistory(){
-    const el=document.getElementById('scanHistory');
-    if(!scanHistory.length){el.innerHTML='<p style="color:var(--g400);font-size:14px">Henüz tarama yapılmadı.</p>';return;}
-    el.innerHTML=scanHistory.map(h=>`
-        <div style="display:flex;align-items:center;gap:16px;padding:14px 20px;background:#fff;border-radius:12px;box-shadow:var(--shadow)">
-            <span style="font-size:24px">${h.found?'✅':'❌'}</span>
-            <div style="flex:1"><div style="font-weight:700;color:var(--g900);font-size:14px">${h.found?eh(h.name):'Bulunamadı'}</div><div style="font-size:12px;color:var(--g400);font-family:monospace">ID: ${eh(h.code)}</div></div>
+
+function renderScanHistory() {
+    const el = document.getElementById('scanHistory');
+    if (!scanHistoryArr.length) { el.innerHTML = '<p style="color:var(--g400);font-size:14px">Henüz tarama yok.</p>'; return; }
+    el.innerHTML = scanHistoryArr.map(h => `
+        <div style="display:flex;align-items:center;gap:16px;padding:14px 20px;background:#fff;border-radius:12px;box-shadow:var(--shadow);margin-bottom:8px">
+            <span style="font-size:24px">${h.found ? '✅' : '❌'}</span>
+            <div style="flex:1"><div style="font-weight:700;color:var(--g900)">${h.found ? eh(h.name) : 'Bulunamadı'}</div><div style="font-size:12px;color:var(--g400);font-family:monospace">ID: ${eh(h.code)}</div></div>
             <div style="font-size:12px;color:var(--g400)">🕐 ${h.time}</div>
-            ${h.found?`<button class="btn btn-p btn-sm" onclick="hlShow('${esc(h.code)}')">Göster</button>`:''}
+            ${h.found ? `<button class="btn btn-p btn-sm" onclick="hlShow('${esc(h.code)}')">Göster</button>` : ''}
         </div>`).join('');
 }
 
-// ===== DETAIL =====
-function showDetail(id){
-    const b=findById(id);if(!b)return;
-    document.getElementById('detailContent').innerHTML=`
-        <span class="bcat ${cClass(b.category)}" style="display:inline-block;margin-bottom:16px">${cEmoji(b.category)} ${eh(b.category||'Diğer')}</span>
-        <div style="font-size:26px;font-weight:800;margin-bottom:8px;color:var(--g900);line-height:1.3">${eh(b.name||'İsimsiz')}</div>
-        <div style="font-size:16px;color:var(--primary);font-weight:600;margin-bottom:6px">✍️ ${eh(b.author||'Bilinmiyor')}</div>
+// ========== DETAIL ==========
+function showDetail(id) {
+    const b = findById(id); if (!b) return;
+    document.getElementById('detailContent').innerHTML = `
+        <span class="bcat ${cClass(b.category)}" style="display:inline-block;margin-bottom:16px">${cEmoji(b.category)} ${eh(b.category || 'Diğer')}</span>
+        <div style="font-size:26px;font-weight:800;margin-bottom:8px;color:var(--g900)">${eh(b.name)}</div>
+        <div style="font-size:16px;color:var(--primary);font-weight:600;margin-bottom:6px">✍️ ${eh(b.author)}</div>
         <div style="font-size:13px;color:var(--g400);margin-bottom:20px;font-family:monospace">🏷️ ID: ${eh(b.id)}</div>
-        <div style="font-size:15px;line-height:1.8;color:var(--g600);margin-bottom:24px;padding:20px;background:var(--g50);border-radius:12px;border-left:4px solid var(--primary)">${eh(b.summary||'Özet yok.')}</div>
+        <div style="font-size:15px;line-height:1.8;color:var(--g600);margin-bottom:24px;padding:20px;background:var(--g50);border-radius:12px;border-left:4px solid var(--primary)">${eh(b.summary || 'Özet yok.')}</div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid var(--g200)">
-            <span class="bd">📅 ${fDate(b.date)}</span><div class="br">${stars(b.rating)}</div>
+            <span class="bd2">📅 ${fDate(b.date)}</span><div class="br2">${stars(b.rating)}</div>
         </div>
-        ${isAdmin?`<div style="display:flex;gap:10px;margin-top:20px">
+        ${isAdmin ? `<div style="display:flex;gap:10px;margin-top:20px">
             <button class="btn btn-p" onclick="cDM();editBook('${esc(b.id)}')" style="flex:1;justify-content:center">✏️ Düzenle</button>
             <button class="btn btn-d" onclick="cDM();deleteBook('${esc(b.id)}')" style="flex:1;justify-content:center">🗑️ Sil</button>
-        </div>`:''}`;
+        </div>` : ''}`;
     document.getElementById('detailModal').classList.add('active');
 }
-function cDM(){document.getElementById('detailModal').classList.remove('active');}
-function cCM(){document.getElementById('confirmModal').classList.remove('active');confirmCb=null;}
-function doConfirm(){if(confirmCb)confirmCb();cCM();}
 
-// ===== HELPERS =====
-function findById(id){return books.find(b=>String(b.id)===String(id).trim());}
-function hlShow(id){
-    const b=findById(id);
-    if(b){window._hlId=String(b.id);currentFilter='all';
-        const si=document.getElementById('searchInput');if(si)si.value='';
-        const ii=document.getElementById('idSearchInput');if(ii)ii.value=String(b.id);
-        goPage('books',document.querySelector('[data-page="books"]'));renderAll();showDetail(String(b.id));return true;}
+function cDM() { document.getElementById('detailModal').classList.remove('active'); }
+function cCM() { document.getElementById('confirmModal').classList.remove('active'); confirmCb = null; }
+function doConfirm() { if (confirmCb) confirmCb(); cCM(); }
+
+// ========== HELPERS ==========
+function findById(id) { return books.find(b => String(b.id) === String(id).trim()); }
+function hlShow(id) {
+    const b = findById(id);
+    if (b) { window._hlId = String(b.id); currentFilter = 'all'; const si = document.getElementById('searchInput'); if (si) si.value = ''; const ii = document.getElementById('idSearchInput'); if (ii) ii.value = String(b.id); goPage('books', document.querySelector('[data-page="books"]')); renderAll(); showDetail(String(b.id)); return true; }
     return false;
 }
-function filterCat(c,btn){currentFilter=c;document.querySelectorAll('.fchip').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');renderBooks();}
-function setView(v){currentView=v;document.getElementById('gridBtn').classList.toggle('active',v==='grid');document.getElementById('listBtn').classList.toggle('active',v==='list');document.getElementById('booksGrid').style.display=v==='grid'?'grid':'none';document.getElementById('booksList').style.display=v==='list'?'flex':'none';}
-function goPage(p,el){document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');document.querySelectorAll('.s-menu a').forEach(a=>a.classList.remove('active'));if(el)el.classList.add('active');if(window.innerWidth<=1024)document.getElementById('sidebar').classList.remove('open');}
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
-document.addEventListener('click',e=>{if(window.innerWidth<=1024){const s=document.getElementById('sidebar'),h=document.getElementById('hamburgerBtn');if(!s.contains(e.target)&&!h.contains(e.target))s.classList.remove('open');}});
-function downloadCopy(){const b=new Blob([JSON.stringify(books,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='kitap_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);toast('İndirildi! 📥','success');}
-function fDate(d){if(!d)return'Tarih yok';try{const x=new Date(d);return isNaN(x)?d:x.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});}catch{return d;}}
-function eh(t){if(!t)return'';const d=document.createElement('div');d.textContent=String(t);return d.innerHTML;}
-function esc(t){return String(t||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
-function toast(m,type='info'){const c=document.getElementById('toastContainer');const ic={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};const t=document.createElement('div');t.className='toast '+type;t.innerHTML=`<span>${ic[type]||'ℹ️'}</span> ${m}`;c.appendChild(t);setTimeout(()=>t.remove(),3000);}
+function filterCat(c, btn) { currentFilter = c; document.querySelectorAll('.fchip').forEach(x => x.classList.remove('active')); if (btn) btn.classList.add('active'); renderBooks(); }
+function setView(v) { currentView = v; document.getElementById('gridBtn').classList.toggle('active', v === 'grid'); document.getElementById('listBtn').classList.toggle('active', v === 'list'); document.getElementById('booksGrid').style.display = v === 'grid' ? 'grid' : 'none'; document.getElementById('booksList').style.display = v === 'list' ? 'flex' : 'none'; }
+function goPage(p, el) { document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active')); document.getElementById('page-' + p).classList.add('active'); document.querySelectorAll('.s-menu a').forEach(a => a.classList.remove('active')); if (el) el.classList.add('active'); if (window.innerWidth <= 1024) document.getElementById('sidebar').classList.remove('open'); }
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+document.addEventListener('click', e => { if (window.innerWidth <= 1024) { const s = document.getElementById('sidebar'), h = document.getElementById('hamburgerBtn'); if (!s.contains(e.target) && !h.contains(e.target)) s.classList.remove('open'); } });
+function downloadCopy() { const b = new Blob([JSON.stringify(books, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'kitap_' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); URL.revokeObjectURL(a.href); toast('İndirildi!', 'success'); }
+function fDate(d) { if (!d) return '-'; try { const x = new Date(d); return isNaN(x) ? d : x.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }); } catch { return d; } }
+function eh(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = String(t); return d.innerHTML; }
+function esc(t) { return String(t || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+function toast(m, type = 'info') { const c = document.getElementById('toastContainer'); const ic = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' }; const t = document.createElement('div'); t.className = 'toast ' + type; t.innerHTML = `<span>${ic[type] || 'ℹ️'}</span> ${m}`; c.appendChild(t); setTimeout(() => t.remove(), 3000); }
 
-document.querySelectorAll('.mo').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');});});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.mo.active').forEach(m=>m.classList.remove('active'));closeScanner();}});
+document.querySelectorAll('.mo').forEach(o => { o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); }); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { document.querySelectorAll('.mo.active').forEach(m => m.classList.remove('active')); closeScanner(); } });
 </script>
 </body>
 </html>
