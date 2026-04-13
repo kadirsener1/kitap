@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 ISBN Kitap Tarayıcı</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Barkod okuma kütüphanesi -->
+    <script src="https://unpkg.com/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">📚</div>
+            <h1>ISBN Kitap Tarayıcı</h1>
+            <p class="subtitle">Kitabınızın barkodunu kameraya gösterin, bilgilerini anında öğrenin</p>
+        </header>
+
+        <!-- Tab Menü -->
+        <div class="tab-menu">
+            <button class="tab-btn active" data-tab="scan">
+                📷 Kamera ile Tara
+            </button>
+            <button class="tab-btn" data-tab="manual">
+                ⌨️ Manuel Giriş
+            </button>
+            <button class="tab-btn" data-tab="history">
+                📋 Geçmiş
+            </button>
+        </div>
+
+        <!-- Kamera Tarama Bölümü -->
+        <div id="scan-tab" class="tab-content active">
+            <div class="scanner-wrapper">
+                <div id="scanner-container" class="scanner-container">
+                    <div id="interactive" class="viewport">
+                        <div class="scanner-overlay">
+                            <div class="scan-line"></div>
+                        </div>
+                    </div>
+                    <div class="scanner-placeholder" id="scanner-placeholder">
+                        <div class="camera-icon">📷</div>
+                        <p>Taramayı başlatmak için aşağıdaki butona tıklayın</p>
+                    </div>
+                </div>
+                <div class="scanner-controls">
+                    <button id="start-btn" class="btn btn-primary" onclick="startScanner()">
+                        ▶️ Taramayı Başlat
+                    </button>
+                    <button id="stop-btn" class="btn btn-danger" onclick="stopScanner()" style="display:none;">
+                        ⏹️ Taramayı Durdur
+                    </button>
+                </div>
+                <div id="detected-code" class="detected-code" style="display:none;">
+                    <span class="label">Tespit Edilen ISBN:</span>
+                    <span id="isbn-display" class="code"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manuel Giriş Bölümü -->
+        <div id="manual-tab" class="tab-content">
+            <div class="manual-input-wrapper">
+                <div class="input-group">
+                    <label for="isbn-input">ISBN Numarası Girin</label>
+                    <div class="input-row">
+                        <input 
+                            type="text" 
+                            id="isbn-input" 
+                            placeholder="Örn: 9780134685991" 
+                            maxlength="13"
+                            pattern="[0-9]*"
+                        >
+                        <button class="btn btn-primary" onclick="manualSearch()">
+                            🔍 Ara
+                        </button>
+                    </div>
+                    <small>10 veya 13 haneli ISBN numarasını girin</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Geçmiş Bölümü -->
+        <div id="history-tab" class="tab-content">
+            <div class="history-wrapper">
+                <div class="history-header">
+                    <h3>📋 Tarama Geçmişi</h3>
+                    <button class="btn btn-small btn-danger" onclick="clearHistory()">
+                        🗑️ Temizle
+                    </button>
+                </div>
+                <div id="history-list" class="history-list">
+                    <div class="empty-state">
+                        <span class="empty-icon">📭</span>
+                        <p>Henüz tarama geçmişi yok</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yükleniyor -->
+        <div id="loading" class="loading" style="display:none;">
+            <div class="spinner"></div>
+            <p>Kitap bilgileri getiriliyor...</p>
+        </div>
+
+        <!-- Kitap Bilgi Kartı -->
+        <div id="book-result" class="book-result" style="display:none;">
+            <div class="result-header">
+                <h2>📖 Kitap Bilgileri</h2>
+                <button class="btn btn-small" onclick="closeResult()">✕</button>
+            </div>
+            <div class="book-card">
+                <div class="book-cover-section">
+                    <img id="book-cover" src="" alt="Kitap Kapağı" class="book-cover">
+                    <div id="no-cover" class="no-cover" style="display:none;">
+                        <span>📕</span>
+                        <small>Kapak bulunamadı</small>
+                    </div>
+                </div>
+                <div class="book-details">
+                    <h2 id="book-title" class="book-title"></h2>
+                    <div class="detail-row">
+                        <span class="detail-label">✍️ Yazar(lar):</span>
+                        <span id="book-authors" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🏢 Yayınevi:</span>
+                        <span id="book-publisher" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">📅 Yayın Tarihi:</span>
+                        <span id="book-date" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">📄 Sayfa Sayısı:</span>
+                        <span id="book-pages" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🏷️ ISBN:</span>
+                        <span id="book-isbn" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🌐 Dil:</span>
+                        <span id="book-language" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">📂 Kategoriler:</span>
+                        <span id="book-categories" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row description-row">
+                        <span class="detail-label">📝 Açıklama:</span>
+                        <p id="book-description" class="detail-value description"></p>
+                    </div>
+                    <div class="book-actions">
+                        <a id="book-preview" href="#" target="_blank" class="btn btn-primary">
+                            👁️ Önizleme
+                        </a>
+                        <a id="book-info" href="#" target="_blank" class="btn btn-secondary">
+                            ℹ️ Daha Fazla Bilgi
+                        </a>
+                        <button class="btn btn-secondary" onclick="shareBook()">
+                            📤 Paylaş
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hata Mesajı -->
+        <div id="error-message" class="error-message" style="display:none;">
+            <span class="error-icon">❌</span>
+            <p id="error-text"></p>
+            <button class="btn btn-small" onclick="closeError()">Tamam</button>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Google Books API kullanılmaktadır • 📚 ISBN Kitap Tarayıcı</p>
+        </footer>
+    </div>
+
+    <!-- Bildirim Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
