@@ -2,10 +2,12 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>📚 Kütüphane Yönetim Sistemi</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
+    <!-- ZXing - Çok daha güvenilir barkod okuyucu -->
+    <script src="https://unpkg.com/@aspect-build/aspect-build@latest" onerror="true"></script>
+    <script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
 </head>
 <body>
 
@@ -14,7 +16,7 @@
     <div class="sidebar-header">
         <span class="sidebar-logo">📚</span>
         <h2>Kütüphane</h2>
-        <button class="sidebar-close" id="sidebar-close">✕</button>
+        <button class="sidebar-close" id="sidebar-close" onclick="closeSidebar()">✕</button>
     </div>
     <nav class="sidebar-nav">
         <button class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
@@ -34,7 +36,7 @@
         </button>
     </nav>
     <div class="sidebar-footer">
-        <small>Kütüphane Yönetim v2.0</small>
+        <small>Kütüphane Yönetim v3.0</small>
     </div>
 </aside>
 
@@ -137,16 +139,26 @@
                         <button class="btn btn-primary btn-sm" onclick="quickISBNFill()">Doldur</button>
                     </div>
                 </div>
-                <!-- Form Scanner Modal -->
-                <div id="form-scanner-area" class="form-scanner-area" style="display:none;">
-                    <div class="scanner-box">
-                        <div id="form-interactive" class="viewport">
-                            <div class="scanner-overlay-mini">
-                                <div class="scan-line"></div>
-                            </div>
+                <!-- Inline Scanner -->
+                <div id="form-scanner-area" class="inline-scanner-area" style="display:none;">
+                    <div class="scanner-box-enhanced">
+                        <video id="form-scanner-video" class="scanner-video" playsinline></video>
+                        <div class="scanner-frame">
+                            <div class="frame-corner tl"></div>
+                            <div class="frame-corner tr"></div>
+                            <div class="frame-corner bl"></div>
+                            <div class="frame-corner br"></div>
+                            <div class="scan-laser"></div>
                         </div>
+                        <div class="scanner-status" id="form-scanner-status">Barkodu çerçeve içine hizalayın</div>
                     </div>
-                    <button class="btn btn-danger btn-sm" onclick="closeFormScanner()">⏹ Kapat</button>
+                    <div class="scanner-toolbar">
+                        <button class="tool-btn" onclick="toggleZoom('form', -1)" title="Uzaklaştır">➖</button>
+                        <span class="zoom-label" id="form-zoom-label">1.0x</span>
+                        <button class="tool-btn" onclick="toggleZoom('form', 1)" title="Yakınlaştır">➕</button>
+                        <button class="tool-btn" id="form-torch-btn" onclick="toggleTorch('form')" title="Fener">🔦</button>
+                        <button class="tool-btn tool-close" onclick="closeFormScanner()">⏹ Kapat</button>
+                    </div>
                 </div>
             </div>
 
@@ -158,44 +170,36 @@
                         <label for="book-name">📖 Kitap Adı *</label>
                         <input type="text" id="book-name" required placeholder="Kitabın adını girin">
                     </div>
-
                     <div class="form-group">
                         <label for="book-author">✍️ Yazar *</label>
                         <input type="text" id="book-author" required placeholder="Yazar adı">
                     </div>
-
                     <div class="form-group">
                         <label for="book-isbn-field">🏷️ ISBN</label>
                         <input type="text" id="book-isbn-field" placeholder="ISBN numarası" maxlength="13">
                     </div>
-
                     <div class="form-group">
                         <label for="book-category">📂 Kategori *</label>
                         <select id="book-category" required>
                             <option value="">Kategori seçin...</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label for="book-year">📅 Yayın Yılı</label>
                         <input type="number" id="book-year" placeholder="Örn: 2023" min="1000" max="2099">
                     </div>
-
                     <div class="form-group">
-                        <label for="book-publisher">🏢 Yayınevi</label>
+                        <label for="book-publisher-field">🏢 Yayınevi</label>
                         <input type="text" id="book-publisher-field" placeholder="Yayınevi adı">
                     </div>
-
                     <div class="form-group">
                         <label for="book-pages-field">📄 Sayfa Sayısı</label>
                         <input type="number" id="book-pages-field" placeholder="Sayfa sayısı" min="1">
                     </div>
-
                     <div class="form-group full-width">
                         <label for="book-desc">📝 Açıklama</label>
                         <textarea id="book-desc" rows="4" placeholder="Kitap hakkında kısa bir açıklama yazın..."></textarea>
                     </div>
-
                     <div class="form-group full-width">
                         <label for="book-cover-url">🖼️ Kapak Görseli URL</label>
                         <input type="url" id="book-cover-url" placeholder="https://... (opsiyonel)">
@@ -203,12 +207,8 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary btn-lg" id="form-submit-btn">
-                        💾 Kitabı Kaydet
-                    </button>
-                    <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">
-                        🔄 Temizle
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-lg" id="form-submit-btn">💾 Kitabı Kaydet</button>
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">🔄 Temizle</button>
                 </div>
             </form>
         </div>
@@ -240,14 +240,26 @@
             </div>
         </div>
 
-        <!-- Search Scanner -->
-        <div id="search-scanner-area" class="form-scanner-area" style="display:none;">
-            <div class="scanner-box">
-                <div id="search-interactive" class="viewport">
-                    <div class="scanner-overlay-mini"><div class="scan-line"></div></div>
+        <!-- Search Scanner Inline -->
+        <div id="search-scanner-area" class="inline-scanner-area" style="display:none;">
+            <div class="scanner-box-enhanced">
+                <video id="search-scanner-video" class="scanner-video" playsinline></video>
+                <div class="scanner-frame">
+                    <div class="frame-corner tl"></div>
+                    <div class="frame-corner tr"></div>
+                    <div class="frame-corner bl"></div>
+                    <div class="frame-corner br"></div>
+                    <div class="scan-laser"></div>
                 </div>
+                <div class="scanner-status" id="search-scanner-status">Barkodu çerçeve içine hizalayın</div>
             </div>
-            <button class="btn btn-danger btn-sm" onclick="closeSearchScanner()">⏹ Kapat</button>
+            <div class="scanner-toolbar">
+                <button class="tool-btn" onclick="toggleZoom('search', -1)">➖</button>
+                <span class="zoom-label" id="search-zoom-label">1.0x</span>
+                <button class="tool-btn" onclick="toggleZoom('search', 1)">➕</button>
+                <button class="tool-btn" id="search-torch-btn" onclick="toggleTorch('search')">🔦</button>
+                <button class="tool-btn tool-close" onclick="closeSearchScanner()">⏹ Kapat</button>
+            </div>
         </div>
 
         <div id="books-grid" class="books-grid"></div>
@@ -261,26 +273,46 @@
     <section class="page" id="page-scan-search">
         <div class="scan-search-container">
             <div class="scan-section">
-                <h3>📷 Barkod Tarayıcı</h3>
+                <h3>📷 Gelişmiş Barkod Tarayıcı</h3>
                 <p>Kitabın ISBN barkodunu tarayarak kütüphanede arayın veya online bilgi çekin</p>
+                <div class="scan-tips">
+                    <span>💡</span>
+                    <ul>
+                        <li>Barkodu çerçevenin ortasına hizalayın</li>
+                        <li>Yakınlaştırmak için ➕ butonunu kullanın</li>
+                        <li>Karanlık ortamda 🔦 fener açın</li>
+                        <li>Telefonu sabit tutun</li>
+                    </ul>
+                </div>
 
                 <div class="scanner-wrapper-main">
-                    <div id="main-scanner-container" class="scanner-container-main">
-                        <div id="main-interactive" class="viewport">
-                            <div class="scanner-overlay-main">
-                                <div class="scan-line"></div>
-                            </div>
+                    <div class="scanner-box-enhanced scanner-large">
+                        <video id="main-scanner-video" class="scanner-video" playsinline></video>
+                        <div class="scanner-frame">
+                            <div class="frame-corner tl"></div>
+                            <div class="frame-corner tr"></div>
+                            <div class="frame-corner bl"></div>
+                            <div class="frame-corner br"></div>
+                            <div class="scan-laser"></div>
                         </div>
-                        <div class="scanner-placeholder" id="main-scanner-placeholder">
+                        <div class="scanner-status" id="main-scanner-status">Taramayı başlatın</div>
+                        <div class="scanner-placeholder-inner" id="main-scanner-placeholder">
                             <div class="camera-icon">📷</div>
                             <p>Taramayı başlatmak için butona tıklayın</p>
                         </div>
                     </div>
+                    <div class="scanner-toolbar" id="main-scanner-toolbar" style="display:none;">
+                        <button class="tool-btn" onclick="toggleZoom('main', -1)">➖</button>
+                        <span class="zoom-label" id="main-zoom-label">1.0x</span>
+                        <button class="tool-btn" onclick="toggleZoom('main', 1)">➕</button>
+                        <button class="tool-btn" id="main-torch-btn" onclick="toggleTorch('main')">🔦</button>
+                        <button class="tool-btn" onclick="switchCamera('main')">🔄</button>
+                    </div>
                     <div class="scanner-controls">
-                        <button id="main-start-btn" class="btn btn-primary" onclick="startMainScanner()">
+                        <button id="main-start-btn" class="btn btn-primary btn-lg" onclick="startMainScanner()">
                             ▶️ Taramayı Başlat
                         </button>
-                        <button id="main-stop-btn" class="btn btn-danger" onclick="stopMainScanner()" style="display:none;">
+                        <button id="main-stop-btn" class="btn btn-danger btn-lg" onclick="stopMainScanner()" style="display:none;">
                             ⏹️ Durdur
                         </button>
                     </div>
@@ -288,7 +320,7 @@
 
                 <div id="scan-result-area" class="scan-result-area" style="display:none;">
                     <div class="scan-result-isbn">
-                        <span class="label">Tespit Edilen ISBN:</span>
+                        <span class="label">✅ Tespit Edilen ISBN:</span>
                         <span id="scanned-isbn" class="code"></span>
                     </div>
                     <div id="scan-local-result"></div>
@@ -306,15 +338,13 @@
                 <div class="section-header">
                     <h3>🏷️ Kategori Yönetimi</h3>
                 </div>
-
                 <div class="add-category-form">
                     <div class="input-row">
                         <input type="text" id="new-category-name" placeholder="Yeni kategori adı...">
-                        <input type="text" id="new-category-icon" placeholder="Emoji (📕)" maxlength="2" class="icon-input">
+                        <input type="text" id="new-category-icon" placeholder="📕" maxlength="2" class="icon-input">
                         <button class="btn btn-primary" onclick="addCategory()">➕ Ekle</button>
                     </div>
                 </div>
-
                 <div id="categories-list" class="categories-list"></div>
             </div>
         </div>
@@ -341,7 +371,7 @@
             <button class="modal-close" onclick="closeConfirm()">✕</button>
         </div>
         <div class="modal-body">
-            <p id="confirm-text">Bu kitabı silmek istediğinize emin misiniz?</p>
+            <p id="confirm-text"></p>
             <div class="modal-actions">
                 <button class="btn btn-danger" id="confirm-yes">🗑️ Sil</button>
                 <button class="btn btn-secondary" onclick="closeConfirm()">İptal</button>
