@@ -3,187 +3,362 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📚 ISBN Kitap Tarayıcı</title>
+    <title>📚 Kütüphane Yönetim Sistemi</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Barkod okuma kütüphanesi -->
     <script src="https://unpkg.com/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo">📚</div>
-            <h1>ISBN Kitap Tarayıcı</h1>
-            <p class="subtitle">Kitabınızın barkodunu kameraya gösterin, bilgilerini anında öğrenin</p>
-        </header>
 
-        <!-- Tab Menü -->
-        <div class="tab-menu">
-            <button class="tab-btn active" data-tab="scan">
-                📷 Kamera ile Tara
-            </button>
-            <button class="tab-btn" data-tab="manual">
-                ⌨️ Manuel Giriş
-            </button>
-            <button class="tab-btn" data-tab="history">
-                📋 Geçmiş
-            </button>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <span class="sidebar-logo">📚</span>
+        <h2>Kütüphane</h2>
+        <button class="sidebar-close" id="sidebar-close">✕</button>
+    </div>
+    <nav class="sidebar-nav">
+        <button class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+            <span class="nav-icon">🏠</span> Ana Sayfa
+        </button>
+        <button class="nav-item" data-page="add-book" onclick="navigateTo('add-book')">
+            <span class="nav-icon">➕</span> Kitap Ekle
+        </button>
+        <button class="nav-item" data-page="books" onclick="navigateTo('books')">
+            <span class="nav-icon">📖</span> Kitaplar
+        </button>
+        <button class="nav-item" data-page="scan-search" onclick="navigateTo('scan-search')">
+            <span class="nav-icon">📷</span> Barkod Tara / Ara
+        </button>
+        <button class="nav-item" data-page="categories" onclick="navigateTo('categories')">
+            <span class="nav-icon">🏷️</span> Kategoriler
+        </button>
+    </nav>
+    <div class="sidebar-footer">
+        <small>Kütüphane Yönetim v2.0</small>
+    </div>
+</aside>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN -->
+<main class="main" id="main">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+        <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+        <h1 id="page-title">Ana Sayfa</h1>
+        <div class="topbar-actions">
+            <span class="book-count" id="topbar-count">0 Kitap</span>
+        </div>
+    </header>
+
+    <!-- ====== DASHBOARD ====== -->
+    <section class="page active" id="page-dashboard">
+        <div class="stats-grid">
+            <div class="stat-card stat-total">
+                <div class="stat-icon">📚</div>
+                <div class="stat-info">
+                    <span class="stat-number" id="stat-total">0</span>
+                    <span class="stat-label">Toplam Kitap</span>
+                </div>
+            </div>
+            <div class="stat-card stat-categories">
+                <div class="stat-icon">🏷️</div>
+                <div class="stat-info">
+                    <span class="stat-number" id="stat-categories">0</span>
+                    <span class="stat-label">Kategori</span>
+                </div>
+            </div>
+            <div class="stat-card stat-recent">
+                <div class="stat-icon">🕐</div>
+                <div class="stat-info">
+                    <span class="stat-number" id="stat-recent">0</span>
+                    <span class="stat-label">Bu Ay Eklenen</span>
+                </div>
+            </div>
+            <div class="stat-card stat-authors">
+                <div class="stat-icon">✍️</div>
+                <div class="stat-info">
+                    <span class="stat-number" id="stat-authors">0</span>
+                    <span class="stat-label">Farklı Yazar</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Kamera Tarama Bölümü -->
-        <div id="scan-tab" class="tab-content active">
-            <div class="scanner-wrapper">
-                <div id="scanner-container" class="scanner-container">
-                    <div id="interactive" class="viewport">
-                        <div class="scanner-overlay">
-                            <div class="scan-line"></div>
+        <div class="dashboard-sections">
+            <div class="section-card">
+                <h3>📊 Kategorilere Göre Dağılım</h3>
+                <div id="category-chart" class="category-chart"></div>
+            </div>
+            <div class="section-card">
+                <h3>🕐 Son Eklenen Kitaplar</h3>
+                <div id="recent-books" class="recent-books-list"></div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h3>⚡ Hızlı İşlemler</h3>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="navigateTo('add-book')">
+                    <span>➕</span> Kitap Ekle
+                </button>
+                <button class="action-btn" onclick="navigateTo('scan-search')">
+                    <span>📷</span> Barkod Tara
+                </button>
+                <button class="action-btn" onclick="navigateTo('categories')">
+                    <span>🏷️</span> Kategori Yönet
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== KİTAP EKLE ====== -->
+    <section class="page" id="page-add-book">
+        <div class="form-container">
+            <div class="form-header">
+                <h2 id="form-title">➕ Yeni Kitap Ekle</h2>
+                <p>Barkod tarayarak veya manuel olarak kitap bilgilerini girin</p>
+            </div>
+
+            <!-- Barkod ile Doldur -->
+            <div class="scan-fill-section">
+                <div class="scan-fill-header">
+                    <h4>📷 Barkod ile Otomatik Doldur</h4>
+                    <p>ISBN barkodunu tarayarak kitap bilgilerini otomatik doldurun</p>
+                </div>
+                <div class="scan-fill-actions">
+                    <button class="btn btn-accent" onclick="openFormScanner()">
+                        📷 Kamera ile Tara
+                    </button>
+                    <span class="divider-text">veya</span>
+                    <div class="isbn-quick-input">
+                        <input type="text" id="quick-isbn" placeholder="ISBN girin..." maxlength="13">
+                        <button class="btn btn-primary btn-sm" onclick="quickISBNFill()">Doldur</button>
+                    </div>
+                </div>
+                <!-- Form Scanner Modal -->
+                <div id="form-scanner-area" class="form-scanner-area" style="display:none;">
+                    <div class="scanner-box">
+                        <div id="form-interactive" class="viewport">
+                            <div class="scanner-overlay-mini">
+                                <div class="scan-line"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="scanner-placeholder" id="scanner-placeholder">
-                        <div class="camera-icon">📷</div>
-                        <p>Taramayı başlatmak için aşağıdaki butona tıklayın</p>
+                    <button class="btn btn-danger btn-sm" onclick="closeFormScanner()">⏹ Kapat</button>
+                </div>
+            </div>
+
+            <form id="book-form" onsubmit="return saveBook(event)">
+                <input type="hidden" id="book-id" value="">
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="book-name">📖 Kitap Adı *</label>
+                        <input type="text" id="book-name" required placeholder="Kitabın adını girin">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="book-author">✍️ Yazar *</label>
+                        <input type="text" id="book-author" required placeholder="Yazar adı">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="book-isbn-field">🏷️ ISBN</label>
+                        <input type="text" id="book-isbn-field" placeholder="ISBN numarası" maxlength="13">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="book-category">📂 Kategori *</label>
+                        <select id="book-category" required>
+                            <option value="">Kategori seçin...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="book-year">📅 Yayın Yılı</label>
+                        <input type="number" id="book-year" placeholder="Örn: 2023" min="1000" max="2099">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="book-publisher">🏢 Yayınevi</label>
+                        <input type="text" id="book-publisher-field" placeholder="Yayınevi adı">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="book-pages-field">📄 Sayfa Sayısı</label>
+                        <input type="number" id="book-pages-field" placeholder="Sayfa sayısı" min="1">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="book-desc">📝 Açıklama</label>
+                        <textarea id="book-desc" rows="4" placeholder="Kitap hakkında kısa bir açıklama yazın..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="book-cover-url">🖼️ Kapak Görseli URL</label>
+                        <input type="url" id="book-cover-url" placeholder="https://... (opsiyonel)">
                     </div>
                 </div>
-                <div class="scanner-controls">
-                    <button id="start-btn" class="btn btn-primary" onclick="startScanner()">
-                        ▶️ Taramayı Başlat
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg" id="form-submit-btn">
+                        💾 Kitabı Kaydet
                     </button>
-                    <button id="stop-btn" class="btn btn-danger" onclick="stopScanner()" style="display:none;">
-                        ⏹️ Taramayı Durdur
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">
+                        🔄 Temizle
                     </button>
                 </div>
-                <div id="detected-code" class="detected-code" style="display:none;">
-                    <span class="label">Tespit Edilen ISBN:</span>
-                    <span id="isbn-display" class="code"></span>
+            </form>
+        </div>
+    </section>
+
+    <!-- ====== KİTAPLAR LİSTESİ ====== -->
+    <section class="page" id="page-books">
+        <div class="books-toolbar">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" placeholder="Kitap adı, yazar veya ISBN ara..." oninput="filterBooks()">
+                <button class="btn btn-sm btn-accent" onclick="openSearchScanner()" title="Barkod ile Ara">📷</button>
+            </div>
+            <div class="filter-row">
+                <select id="filter-category" onchange="filterBooks()">
+                    <option value="">Tüm Kategoriler</option>
+                </select>
+                <select id="sort-select" onchange="filterBooks()">
+                    <option value="newest">En Yeni</option>
+                    <option value="oldest">En Eski</option>
+                    <option value="name-asc">A-Z</option>
+                    <option value="name-desc">Z-A</option>
+                    <option value="author-asc">Yazar A-Z</option>
+                </select>
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="grid" onclick="setView('grid')">▦</button>
+                    <button class="view-btn" data-view="list" onclick="setView('list')">☰</button>
                 </div>
             </div>
         </div>
 
-        <!-- Manuel Giriş Bölümü -->
-        <div id="manual-tab" class="tab-content">
-            <div class="manual-input-wrapper">
-                <div class="input-group">
-                    <label for="isbn-input">ISBN Numarası Girin</label>
+        <!-- Search Scanner -->
+        <div id="search-scanner-area" class="form-scanner-area" style="display:none;">
+            <div class="scanner-box">
+                <div id="search-interactive" class="viewport">
+                    <div class="scanner-overlay-mini"><div class="scan-line"></div></div>
+                </div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="closeSearchScanner()">⏹ Kapat</button>
+        </div>
+
+        <div id="books-grid" class="books-grid"></div>
+        <div id="no-books" class="empty-state" style="display:none;">
+            <span class="empty-icon">📭</span>
+            <p>Kitap bulunamadı</p>
+        </div>
+    </section>
+
+    <!-- ====== BARKOD TARA / ARA ====== -->
+    <section class="page" id="page-scan-search">
+        <div class="scan-search-container">
+            <div class="scan-section">
+                <h3>📷 Barkod Tarayıcı</h3>
+                <p>Kitabın ISBN barkodunu tarayarak kütüphanede arayın veya online bilgi çekin</p>
+
+                <div class="scanner-wrapper-main">
+                    <div id="main-scanner-container" class="scanner-container-main">
+                        <div id="main-interactive" class="viewport">
+                            <div class="scanner-overlay-main">
+                                <div class="scan-line"></div>
+                            </div>
+                        </div>
+                        <div class="scanner-placeholder" id="main-scanner-placeholder">
+                            <div class="camera-icon">📷</div>
+                            <p>Taramayı başlatmak için butona tıklayın</p>
+                        </div>
+                    </div>
+                    <div class="scanner-controls">
+                        <button id="main-start-btn" class="btn btn-primary" onclick="startMainScanner()">
+                            ▶️ Taramayı Başlat
+                        </button>
+                        <button id="main-stop-btn" class="btn btn-danger" onclick="stopMainScanner()" style="display:none;">
+                            ⏹️ Durdur
+                        </button>
+                    </div>
+                </div>
+
+                <div id="scan-result-area" class="scan-result-area" style="display:none;">
+                    <div class="scan-result-isbn">
+                        <span class="label">Tespit Edilen ISBN:</span>
+                        <span id="scanned-isbn" class="code"></span>
+                    </div>
+                    <div id="scan-local-result"></div>
+                    <div id="scan-online-result"></div>
+                    <div class="scan-actions" id="scan-actions"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== KATEGORİLER ====== -->
+    <section class="page" id="page-categories">
+        <div class="categories-container">
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>🏷️ Kategori Yönetimi</h3>
+                </div>
+
+                <div class="add-category-form">
                     <div class="input-row">
-                        <input 
-                            type="text" 
-                            id="isbn-input" 
-                            placeholder="Örn: 9780134685991" 
-                            maxlength="13"
-                            pattern="[0-9]*"
-                        >
-                        <button class="btn btn-primary" onclick="manualSearch()">
-                            🔍 Ara
-                        </button>
+                        <input type="text" id="new-category-name" placeholder="Yeni kategori adı...">
+                        <input type="text" id="new-category-icon" placeholder="Emoji (📕)" maxlength="2" class="icon-input">
+                        <button class="btn btn-primary" onclick="addCategory()">➕ Ekle</button>
                     </div>
-                    <small>10 veya 13 haneli ISBN numarasını girin</small>
                 </div>
+
+                <div id="categories-list" class="categories-list"></div>
             </div>
         </div>
+    </section>
 
-        <!-- Geçmiş Bölümü -->
-        <div id="history-tab" class="tab-content">
-            <div class="history-wrapper">
-                <div class="history-header">
-                    <h3>📋 Tarama Geçmişi</h3>
-                    <button class="btn btn-small btn-danger" onclick="clearHistory()">
-                        🗑️ Temizle
-                    </button>
-                </div>
-                <div id="history-list" class="history-list">
-                    <div class="empty-state">
-                        <span class="empty-icon">📭</span>
-                        <p>Henüz tarama geçmişi yok</p>
-                    </div>
-                </div>
-            </div>
+</main>
+
+<!-- KİTAP DETAY MODAL -->
+<div class="modal-overlay" id="book-detail-modal" style="display:none;">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>📖 Kitap Detayı</h3>
+            <button class="modal-close" onclick="closeModal()">✕</button>
         </div>
-
-        <!-- Yükleniyor -->
-        <div id="loading" class="loading" style="display:none;">
-            <div class="spinner"></div>
-            <p>Kitap bilgileri getiriliyor...</p>
-        </div>
-
-        <!-- Kitap Bilgi Kartı -->
-        <div id="book-result" class="book-result" style="display:none;">
-            <div class="result-header">
-                <h2>📖 Kitap Bilgileri</h2>
-                <button class="btn btn-small" onclick="closeResult()">✕</button>
-            </div>
-            <div class="book-card">
-                <div class="book-cover-section">
-                    <img id="book-cover" src="" alt="Kitap Kapağı" class="book-cover">
-                    <div id="no-cover" class="no-cover" style="display:none;">
-                        <span>📕</span>
-                        <small>Kapak bulunamadı</small>
-                    </div>
-                </div>
-                <div class="book-details">
-                    <h2 id="book-title" class="book-title"></h2>
-                    <div class="detail-row">
-                        <span class="detail-label">✍️ Yazar(lar):</span>
-                        <span id="book-authors" class="detail-value"></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">🏢 Yayınevi:</span>
-                        <span id="book-publisher" class="detail-value"></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">📅 Yayın Tarihi:</span>
-                        <span id="book-date" class="detail-value"></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">📄 Sayfa Sayısı:</span>
-                        <span id="book-pages" class="detail-value"></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">🏷️ ISBN:</span>
-                        <span id="book-isbn" class="detail-value"></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">🌐 Dil:</span>
-                        <span id="book-language" class="detail-value"></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">📂 Kategoriler:</span>
-                        <span id="book-categories" class="detail-value"></span>
-                    </div>
-                    <div class="detail-row description-row">
-                        <span class="detail-label">📝 Açıklama:</span>
-                        <p id="book-description" class="detail-value description"></p>
-                    </div>
-                    <div class="book-actions">
-                        <a id="book-preview" href="#" target="_blank" class="btn btn-primary">
-                            👁️ Önizleme
-                        </a>
-                        <a id="book-info" href="#" target="_blank" class="btn btn-secondary">
-                            ℹ️ Daha Fazla Bilgi
-                        </a>
-                        <button class="btn btn-secondary" onclick="shareBook()">
-                            📤 Paylaş
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Hata Mesajı -->
-        <div id="error-message" class="error-message" style="display:none;">
-            <span class="error-icon">❌</span>
-            <p id="error-text"></p>
-            <button class="btn btn-small" onclick="closeError()">Tamam</button>
-        </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>Google Books API kullanılmaktadır • 📚 ISBN Kitap Tarayıcı</p>
-        </footer>
+        <div class="modal-body" id="modal-body"></div>
     </div>
+</div>
 
-    <!-- Bildirim Toast -->
-    <div id="toast" class="toast"></div>
+<!-- SİLME ONAY MODAL -->
+<div class="modal-overlay" id="confirm-modal" style="display:none;">
+    <div class="modal modal-sm">
+        <div class="modal-header modal-header-danger">
+            <h3>⚠️ Silme Onayı</h3>
+            <button class="modal-close" onclick="closeConfirm()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p id="confirm-text">Bu kitabı silmek istediğinize emin misiniz?</p>
+            <div class="modal-actions">
+                <button class="btn btn-danger" id="confirm-yes">🗑️ Sil</button>
+                <button class="btn btn-secondary" onclick="closeConfirm()">İptal</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <script src="app.js"></script>
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- LOADING -->
+<div id="global-loading" class="global-loading" style="display:none;">
+    <div class="spinner-lg"></div>
+    <p>Yükleniyor...</p>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
