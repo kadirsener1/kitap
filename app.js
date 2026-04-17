@@ -1,9 +1,8 @@
 // ============================================
-//  KÜTÜPHANE YÖNETİM SİSTEMİ v3.0
-//  Gelişmiş ZXing Barkod Tarayıcı
+//  KÜTÜPHANE YÖNETİM SİSTEMİ v3.1
+//  ZXing Barkod + Eğitim Seviyesi
 // ============================================
 
-// ===== DEFAULT CATEGORIES =====
 const DEFAULT_CATEGORIES = [
     { id: 'roman', name: 'Roman', icon: '📖', isDefault: true },
     { id: 'hikaye', name: 'Hikaye', icon: '📝', isDefault: true },
@@ -19,20 +18,26 @@ const DEFAULT_CATEGORIES = [
     { id: 'dgs', name: 'DGS', icon: '🔄', isDefault: true }
 ];
 
-// ===== STATE =====
+const LEVEL_MAP = {
+    'okul-oncesi': { label: 'Okul Öncesi', icon: '💒', css: 'level-okul-oncesi' },
+    'ilkokul':     { label: 'İlkokul (1-4)', icon: '🏫', css: 'level-ilkokul' },
+    'ortaokul':    { label: 'Ortaokul (5-8)', icon: '📐', css: 'level-ortaokul' },
+    'lise':        { label: 'Lise (9-12)', icon: '🎒', css: 'level-lise' },
+    'universite':  { label: 'Üniversite', icon: '🎓', css: 'level-universite' },
+    'yetiskin':    { label: 'Yetişkin', icon: '📚', css: 'level-yetiskin' },
+    'genel':       { label: 'Her Seviye', icon: '🌐', css: 'level-genel' }
+};
+
 let books = [];
 let categories = [];
 let currentView = 'grid';
 
-// ===== SCANNER INSTANCES =====
-// Her scanner için bağımsız state
 const scanners = {
-    form: { stream: null, track: null, reader: null, animId: null, zoom: 1, maxZoom: 1, torch: false, videoEl: null, cooldown: false, buffer: [] },
-    search: { stream: null, track: null, reader: null, animId: null, zoom: 1, maxZoom: 1, torch: false, videoEl: null, cooldown: false, buffer: [] },
-    main: { stream: null, track: null, reader: null, animId: null, zoom: 1, maxZoom: 1, torch: false, videoEl: null, cooldown: false, buffer: [], facingMode: 'environment' }
+    form:   { stream: null, track: null, animId: null, zoom: 1, maxZoom: 1, torch: false, videoEl: null, cooldown: false, buffer: [], facingMode: 'environment' },
+    search: { stream: null, track: null, animId: null, zoom: 1, maxZoom: 1, torch: false, videoEl: null, cooldown: false, buffer: [], facingMode: 'environment' },
+    main:   { stream: null, track: null, animId: null, zoom: 1, maxZoom: 1, torch: false, videoEl: null, cooldown: false, buffer: [], facingMode: 'environment' }
 };
 
-// Doğrulama: Aynı kodu 3 kez üst üste okumalı
 const CONFIRM_COUNT = 3;
 const BUFFER_SIZE = 8;
 
@@ -56,7 +61,6 @@ function loadData() {
     }
     saveCategories();
 }
-
 function saveBooks() { localStorage.setItem('lib_books', JSON.stringify(books)); }
 function saveCategories() { localStorage.setItem('lib_categories', JSON.stringify(categories)); }
 
@@ -106,7 +110,6 @@ function updateStats() {
     }).length;
     document.getElementById('stat-authors').textContent = new Set(books.map(b => b.author.toLowerCase().trim())).size;
 }
-
 function updateTopbarCount() {
     document.getElementById('topbar-count').textContent = `${books.length} Kitap`;
 }
@@ -117,7 +120,7 @@ function renderDashboard() {
     categories.forEach(c => catCounts[c.id] = 0);
     books.forEach(b => { if (catCounts[b.category] !== undefined) catCounts[b.category]++; });
     const maxCount = Math.max(...Object.values(catCounts), 1);
-    const colors = ['#6C63FF', '#48BB78', '#F6AD55', '#FC8181', '#63B3ED', '#B794F4', '#F687B3', '#68D391', '#FBD38D', '#FEB2B2', '#76E4F7', '#C4B5FD'];
+    const colors = ['#6C63FF','#48BB78','#F6AD55','#FC8181','#63B3ED','#B794F4','#F687B3','#68D391','#FBD38D','#FEB2B2','#76E4F7','#C4B5FD'];
     chartEl.innerHTML = categories.map((cat, i) => {
         const count = catCounts[cat.id] || 0;
         const pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
@@ -129,7 +132,6 @@ function renderDashboard() {
     recentEl.innerHTML = recent.length === 0
         ? '<div class="empty-state"><span class="empty-icon">📭</span><p>Henüz kitap eklenmemiş</p></div>'
         : recent.map(b => `<div class="recent-book-item" onclick="showBookDetail('${b.id}')"><div class="rb-cover">${b.coverUrl ? `<img src="${b.coverUrl}" onerror="this.parentElement.innerHTML='📕'" style="width:36px;height:52px;object-fit:cover;border-radius:4px">` : '📕'}</div><div class="rb-info"><div class="rb-title">${esc(b.name)}</div><div class="rb-author">${esc(b.author)}</div></div></div>`).join('');
-
     updateStats();
     updateTopbarCount();
 }
@@ -200,14 +202,11 @@ function deleteCategory(id) {
 }
 
 // ================================================================
-//  SCANNER ENGINE - ZXing tabanlı gelişmiş barkod okuyucu
+//  SCANNER ENGINE - ZXing
 // ================================================================
-
 async function initScanner(key, videoElementId, onDetect) {
     const sc = scanners[key];
-    // Önceki taramayı temizle
     await killScanner(key);
-
     sc.buffer = [];
     sc.cooldown = false;
     sc.zoom = 1;
@@ -217,7 +216,6 @@ async function initScanner(key, videoElementId, onDetect) {
     sc.videoEl = videoEl;
 
     try {
-        // Yüksek çözünürlük + otomatik odaklama
         const constraints = {
             video: {
                 facingMode: sc.facingMode || 'environment',
@@ -228,45 +226,30 @@ async function initScanner(key, videoElementId, onDetect) {
             },
             audio: false
         };
-
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         sc.stream = stream;
         sc.track = stream.getVideoTracks()[0];
 
-        // Max zoom hesapla
         const caps = sc.track.getCapabilities?.();
-        if (caps?.zoom) {
-            sc.maxZoom = Math.min(caps.zoom.max, 10);
-        } else {
-            sc.maxZoom = 1;
-        }
+        sc.maxZoom = caps?.zoom ? Math.min(caps.zoom.max, 10) : 1;
         updateZoomLabel(key);
 
         videoEl.srcObject = stream;
         await videoEl.play();
 
-        // ZXing reader - çoklu format desteği
-        const codeReader = new ZXing.BrowserMultiFormatReader();
-        sc.reader = codeReader;
-
-        // Manuel decode loop - daha iyi kontrol
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
         function decodeFrame() {
             if (!sc.stream || !sc.track || sc.track.readyState === 'ended') return;
-
             if (videoEl.readyState >= 2 && !sc.cooldown) {
                 canvas.width = videoEl.videoWidth;
                 canvas.height = videoEl.videoHeight;
                 ctx.drawImage(videoEl, 0, 0);
-
                 try {
                     const luminance = new ZXing.HTMLCanvasElementLuminanceSource(canvas);
                     const binarizer = new ZXing.HybridBinarizer(luminance);
                     const bitmap = new ZXing.BinaryBitmap(binarizer);
-
-                    // Çoklu format deneme
                     const hints = new Map();
                     hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
                         ZXing.BarcodeFormat.EAN_13,
@@ -276,35 +259,27 @@ async function initScanner(key, videoElementId, onDetect) {
                         ZXing.BarcodeFormat.CODE_128
                     ]);
                     hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-
                     const reader = new ZXing.MultiFormatReader();
                     reader.setHints(hints);
                     const result = reader.decode(bitmap);
-
                     if (result) {
                         const code = result.getText();
                         handleScanResult(key, code, onDetect);
                     }
-                } catch (e) {
-                    // Decode edilemedi - normal, devam et
-                }
+                } catch (e) { /* decode fail, normal */ }
             }
-
             sc.animId = requestAnimationFrame(decodeFrame);
         }
-
         sc.animId = requestAnimationFrame(decodeFrame);
-
         setStatus(key, 'Barkodu çerçeve içine hizalayın', '');
         return true;
-
     } catch (err) {
         console.error('Camera error:', err);
         if (err.name === 'NotAllowedError') {
-            showToast('❌ Kamera izni verilmedi. Tarayıcı ayarlarından izin verin.');
+            showToast('❌ Kamera izni verilmedi');
             setStatus(key, 'Kamera izni gerekli', 'error');
         } else if (err.name === 'NotFoundError') {
-            showToast('❌ Kamera bulunamadı.');
+            showToast('❌ Kamera bulunamadı');
             setStatus(key, 'Kamera bulunamadı', 'error');
         } else {
             showToast('❌ Kamera açılamadı: ' + err.message);
@@ -317,138 +292,84 @@ async function initScanner(key, videoElementId, onDetect) {
 function handleScanResult(key, code, onDetect) {
     const sc = scanners[key];
     if (sc.cooldown) return;
-
-    // ISBN doğrulaması
     if (!isValidISBN(code)) return;
-
-    // Buffer'a ekle
     sc.buffer.push(code);
     if (sc.buffer.length > BUFFER_SIZE) sc.buffer.shift();
-
-    // Aynı kodun CONFIRM_COUNT kez tekrarlanmasını kontrol et
     const count = sc.buffer.filter(c => c === code).length;
-
     if (count >= CONFIRM_COUNT) {
-        // Onaylandı!
         sc.cooldown = true;
         sc.buffer = [];
-
-        // Görsel geri bildirim
         setStatus(key, `✅ Okundu: ${code}`, 'success');
-        const frame = document.querySelector(`#${getVideoId(key)}`).parentElement.querySelector('.scanner-frame');
-        if (frame) {
-            frame.classList.add('detected');
-            setTimeout(() => frame.classList.remove('detected'), 1500);
+        const videoEl = sc.videoEl;
+        if (videoEl) {
+            const frame = videoEl.parentElement.querySelector('.scanner-frame');
+            if (frame) { frame.classList.add('detected'); setTimeout(() => frame.classList.remove('detected'), 1500); }
         }
-
-        // Titreşim
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-
-        // Ses efekti
         playBeep();
-
         showToast('✅ Barkod okundu: ' + code);
-
-        // Callback
         onDetect(code);
-
-        // Cooldown süresi
         setTimeout(() => {
             sc.cooldown = false;
             setStatus(key, 'Barkodu çerçeve içine hizalayın', '');
         }, 2500);
     } else {
-        // Henüz doğrulanmadı, kullanıcıya ilerleme göster
         setStatus(key, `Okunuyor... (${count}/${CONFIRM_COUNT})`, '');
     }
 }
 
-function getVideoId(key) {
-    return key + '-scanner-video';
-}
-
 function setStatus(key, text, type) {
     const el = document.getElementById(`${key}-scanner-status`);
-    if (el) {
-        el.textContent = text;
-        el.className = 'scanner-status' + (type ? ' ' + type : '');
-    }
+    if (el) { el.textContent = text; el.className = 'scanner-status' + (type ? ' ' + type : ''); }
 }
-
 function updateZoomLabel(key) {
     const el = document.getElementById(`${key}-zoom-label`);
     if (el) el.textContent = scanners[key].zoom.toFixed(1) + 'x';
 }
 
-// ===== ZOOM =====
 function toggleZoom(key, direction) {
     const sc = scanners[key];
     if (!sc.track) return;
-
     const caps = sc.track.getCapabilities?.();
-    if (!caps?.zoom) {
-        showToast('⚠️ Bu kamera zoom desteklemiyor');
-        return;
-    }
-
-    const step = 0.5;
-    let newZoom = sc.zoom + (direction * step);
+    if (!caps?.zoom) { showToast('⚠️ Zoom desteklenmiyor'); return; }
+    let newZoom = sc.zoom + (direction * 0.5);
     newZoom = Math.max(caps.zoom.min || 1, Math.min(newZoom, sc.maxZoom));
-
     sc.zoom = newZoom;
     sc.track.applyConstraints({ advanced: [{ zoom: newZoom }] }).catch(() => {});
     updateZoomLabel(key);
 }
 
-// ===== TORCH =====
 function toggleTorch(key) {
     const sc = scanners[key];
     if (!sc.track) return;
-
     const caps = sc.track.getCapabilities?.();
-    if (!caps?.torch) {
-        showToast('⚠️ Fener desteklenmiyor');
-        return;
-    }
-
+    if (!caps?.torch) { showToast('⚠️ Fener desteklenmiyor'); return; }
     sc.torch = !sc.torch;
     sc.track.applyConstraints({ advanced: [{ torch: sc.torch }] }).catch(() => {});
-
     const btn = document.getElementById(`${key}-torch-btn`);
     if (btn) btn.classList.toggle('active', sc.torch);
 }
 
-// ===== CAMERA SWITCH =====
 async function switchCamera(key) {
     const sc = scanners[key];
     sc.facingMode = sc.facingMode === 'environment' ? 'user' : 'environment';
     showToast('🔄 Kamera değiştiriliyor...');
-
-    // Yeniden başlat
-    const videoId = getVideoId(key);
+    const videoId = sc.videoEl?.id;
     const onDetect = key === 'main' ? onMainDetect : (key === 'form' ? onFormDetect : onSearchDetect);
     await killScanner(key);
     setTimeout(() => initScanner(key, videoId, onDetect), 300);
 }
 
-// ===== KILL SCANNER =====
 async function killScanner(key) {
     const sc = scanners[key];
     if (sc.animId) { cancelAnimationFrame(sc.animId); sc.animId = null; }
-    if (sc.stream) {
-        sc.stream.getTracks().forEach(t => t.stop());
-        sc.stream = null;
-    }
-    if (sc.videoEl) {
-        sc.videoEl.srcObject = null;
-    }
+    if (sc.stream) { sc.stream.getTracks().forEach(t => t.stop()); sc.stream = null; }
+    if (sc.videoEl) sc.videoEl.srcObject = null;
     sc.track = null;
-    sc.reader = null;
     sc.torch = false;
     sc.zoom = 1;
     sc.buffer = [];
     sc.cooldown = false;
-
     const btn = document.getElementById(`${key}-torch-btn`);
     if (btn) btn.classList.remove('active');
 }
@@ -459,36 +380,30 @@ function killAllScanners() {
     killScanner('main');
     document.getElementById('form-scanner-area').style.display = 'none';
     document.getElementById('search-scanner-area').style.display = 'none';
-    const placeholder = document.getElementById('main-scanner-placeholder');
-    if (placeholder) placeholder.classList.remove('hidden');
-    document.getElementById('main-scanner-toolbar')?.style && (document.getElementById('main-scanner-toolbar').style.display = 'none');
+    const ph = document.getElementById('main-scanner-placeholder');
+    if (ph) ph.classList.remove('hidden');
+    const tb = document.getElementById('main-scanner-toolbar');
+    if (tb) tb.style.display = 'none';
     const startBtn = document.getElementById('main-start-btn');
     const stopBtn = document.getElementById('main-stop-btn');
     if (startBtn) startBtn.style.display = 'inline-flex';
     if (stopBtn) stopBtn.style.display = 'none';
 }
 
-// ===== BEEP SOUND =====
 function playBeep() {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = 1200;
-        gain.gain.value = 0.15;
-        osc.start();
-        osc.stop(ctx.currentTime + 0.15);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 1200; gain.gain.value = 0.15;
+        osc.start(); osc.stop(ctx.currentTime + 0.15);
         setTimeout(() => {
-            const osc2 = ctx.createOscillator();
-            const gain2 = ctx.createGain();
-            osc2.connect(gain2);
-            gain2.connect(ctx.destination);
-            osc2.frequency.value = 1600;
-            gain2.gain.value = 0.15;
-            osc2.start();
-            osc2.stop(ctx.currentTime + 0.1);
+            const o2 = ctx.createOscillator();
+            const g2 = ctx.createGain();
+            o2.connect(g2); g2.connect(ctx.destination);
+            o2.frequency.value = 1600; g2.gain.value = 0.15;
+            o2.start(); o2.stop(ctx.currentTime + 0.1);
         }, 150);
     } catch (e) {}
 }
@@ -496,18 +411,15 @@ function playBeep() {
 // ================================================================
 //  FORM SCANNER
 // ================================================================
-
 function onFormDetect(code) {
     closeFormScanner();
     fillFormFromISBN(code);
 }
-
 async function openFormScanner() {
     document.getElementById('form-scanner-area').style.display = 'block';
     const ok = await initScanner('form', 'form-scanner-video', onFormDetect);
     if (!ok) closeFormScanner();
 }
-
 function closeFormScanner() {
     killScanner('form');
     document.getElementById('form-scanner-area').style.display = 'none';
@@ -558,20 +470,17 @@ async function fillFormFromISBN(isbn) {
 // ================================================================
 //  SEARCH SCANNER
 // ================================================================
-
 function onSearchDetect(code) {
     closeSearchScanner();
     document.getElementById('search-input').value = code;
     filterBooks();
     showToast('🔍 ISBN ile aranıyor: ' + code);
 }
-
 async function openSearchScanner() {
     document.getElementById('search-scanner-area').style.display = 'block';
     const ok = await initScanner('search', 'search-scanner-video', onSearchDetect);
     if (!ok) closeSearchScanner();
 }
-
 function closeSearchScanner() {
     killScanner('search');
     document.getElementById('search-scanner-area').style.display = 'none';
@@ -580,7 +489,6 @@ function closeSearchScanner() {
 // ================================================================
 //  MAIN SCANNER
 // ================================================================
-
 function onMainDetect(code) {
     document.getElementById('scanned-isbn').textContent = code;
     document.getElementById('scan-result-area').style.display = 'block';
@@ -591,13 +499,13 @@ function onMainDetect(code) {
 
     if (localMatch) {
         const cat = categories.find(c => c.id === localMatch.category);
-        localEl.innerHTML = `<div class="local-match"><h4>📚 Kütüphanede Bulundu!</h4><p><strong>${esc(localMatch.name)}</strong> - ${esc(localMatch.author)}</p>${cat ? `<p>Kategori: ${cat.icon} ${cat.name}</p>` : ''}</div>`;
+        const lv = LEVEL_MAP[localMatch.level];
+        localEl.innerHTML = `<div class="local-match"><h4>📚 Kütüphanede Bulundu!</h4><p><strong>${esc(localMatch.name)}</strong> - ${esc(localMatch.author)}</p>${cat ? `<p>Kategori: ${cat.icon} ${cat.name}</p>` : ''}${lv ? `<p>Seviye: ${lv.icon} ${lv.label}</p>` : ''}</div>`;
         actionsEl.innerHTML = `<button class="btn btn-primary" onclick="showBookDetail('${localMatch.id}')">📖 Detay</button><button class="btn btn-secondary" onclick="editBook('${localMatch.id}')">✏️ Düzenle</button>`;
     } else {
         localEl.innerHTML = `<div class="local-match" style="border-color:var(--warning);background:rgba(246,173,85,.08)"><h4 style="color:var(--warning)">⚠️ Kütüphanede Bulunamadı</h4><p>Bu ISBN ile kayıtlı kitap yok.</p></div>`;
         actionsEl.innerHTML = `<button class="btn btn-accent" onclick="addFromScan('${code}')">➕ Kütüphaneye Ekle</button>`;
     }
-
     fetchOnlineInfo(code);
 }
 
@@ -607,7 +515,6 @@ async function startMainScanner() {
     document.getElementById('main-stop-btn').style.display = 'inline-flex';
     document.getElementById('main-scanner-toolbar').style.display = 'flex';
     document.getElementById('scan-result-area').style.display = 'none';
-
     const ok = await initScanner('main', 'main-scanner-video', onMainDetect);
     if (!ok) stopMainScanner();
 }
@@ -645,7 +552,6 @@ function addFromScan(isbn) {
 // ================================================================
 //  BOOK CRUD
 // ================================================================
-
 function saveBook(e) {
     e.preventDefault();
     const id = document.getElementById('book-id').value;
@@ -655,6 +561,7 @@ function saveBook(e) {
         author: document.getElementById('book-author').value.trim(),
         isbn: document.getElementById('book-isbn-field').value.trim(),
         category: document.getElementById('book-category').value,
+        level: document.getElementById('book-level').value,
         year: document.getElementById('book-year').value,
         publisher: document.getElementById('book-publisher-field').value.trim(),
         pages: document.getElementById('book-pages-field').value,
@@ -674,7 +581,6 @@ function saveBook(e) {
         books.unshift(bookData);
         showToast(`✅ "${bookData.name}" eklendi`);
     }
-
     saveBooks(); renderAll(); resetForm(); navigateTo('books');
     return false;
 }
@@ -682,6 +588,7 @@ function saveBook(e) {
 function resetForm() {
     document.getElementById('book-form').reset();
     document.getElementById('book-id').value = '';
+    document.getElementById('book-level').value = '';
     document.getElementById('form-title').textContent = '➕ Yeni Kitap Ekle';
     document.getElementById('form-submit-btn').innerHTML = '💾 Kitabı Kaydet';
     closeFormScanner();
@@ -696,6 +603,7 @@ function editBook(id) {
     document.getElementById('book-author').value = book.author;
     document.getElementById('book-isbn-field').value = book.isbn || '';
     document.getElementById('book-category').value = book.category;
+    document.getElementById('book-level').value = book.level || '';
     document.getElementById('book-year').value = book.year || '';
     document.getElementById('book-publisher-field').value = book.publisher || '';
     document.getElementById('book-pages-field').value = book.pages || '';
@@ -724,6 +632,11 @@ function showBookDetail(id) {
     if (!book) return;
     const cat = categories.find(c => c.id === book.category);
     const cn = cat ? `${cat.icon} ${cat.name}` : 'Belirtilmemiş';
+    const lv = LEVEL_MAP[book.level];
+    const levelHtml = lv
+        ? `<div class="detail-row"><span class="dl">🎓 Eğitim Seviyesi:</span><span class="dv"><span class="detail-level-badge ${lv.css}">${lv.icon} ${lv.label}</span></span></div>`
+        : '';
+
     document.getElementById('modal-body').innerHTML = `
         <div class="detail-grid">
             <div class="detail-cover">${book.coverUrl ? `<img src="${book.coverUrl}" onerror="this.parentElement.innerHTML='<div class=\\'cover-ph\\'>📕</div>'">` : '<div class="cover-ph">📕</div>'}</div>
@@ -731,6 +644,7 @@ function showBookDetail(id) {
                 <h2 style="font-size:1.3rem;margin-bottom:8px">${esc(book.name)}</h2>
                 <div class="detail-row"><span class="dl">✍️ Yazar:</span><span class="dv">${esc(book.author)}</span></div>
                 <div class="detail-row"><span class="dl">📂 Kategori:</span><span class="dv">${cn}</span></div>
+                ${levelHtml}
                 ${book.isbn ? `<div class="detail-row"><span class="dl">🏷️ ISBN:</span><span class="dv" style="font-family:monospace">${book.isbn}</span></div>` : ''}
                 ${book.publisher ? `<div class="detail-row"><span class="dl">🏢 Yayınevi:</span><span class="dv">${esc(book.publisher)}</span></div>` : ''}
                 ${book.year ? `<div class="detail-row"><span class="dl">📅 Yıl:</span><span class="dv">${book.year}</span></div>` : ''}
@@ -758,10 +672,13 @@ function renderBooks() {
     grid.innerHTML = filtered.map(book => {
         const cat = categories.find(c => c.id === book.category);
         const cl = cat ? `${cat.icon} ${cat.name}` : '';
+        const lv = LEVEL_MAP[book.level];
+        const levelBadge = lv ? `<span class="book-card-level ${lv.css}">${lv.icon} ${lv.label}</span>` : '';
+
         return `<div class="book-card-item" onclick="showBookDetail('${book.id}')">
             <div class="book-card-cover">${book.coverUrl ? `<img src="${book.coverUrl}" onerror="this.parentElement.innerHTML='<span class=\\'cover-placeholder\\'>📕</span>'">` : '<span class="cover-placeholder">📕</span>'}</div>
             <div class="book-card-body">
-                ${cl ? `<span class="book-card-category">${cl}</span>` : ''}
+                ${cl ? `<span class="book-card-category">${cl}</span>` : ''}${levelBadge}
                 <h4 class="book-card-title">${esc(book.name)}</h4>
                 <p class="book-card-author">✍️ ${esc(book.author)}</p>
                 <div class="book-card-meta">${book.year ? `<span>📅 ${book.year}</span>` : '<span></span>'}${book.pages ? `<span>📄 ${book.pages}s</span>` : '<span></span>'}</div>
@@ -776,10 +693,16 @@ function renderBooks() {
 function getFilteredBooks() {
     const search = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
     const catFilter = document.getElementById('filter-category')?.value || '';
+    const levelFilter = document.getElementById('filter-level')?.value || '';
     const sort = document.getElementById('sort-select')?.value || 'newest';
     let result = [...books];
-    if (search) result = result.filter(b => b.name.toLowerCase().includes(search) || b.author.toLowerCase().includes(search) || (b.isbn && b.isbn.includes(search)));
+    if (search) result = result.filter(b =>
+        b.name.toLowerCase().includes(search) ||
+        b.author.toLowerCase().includes(search) ||
+        (b.isbn && b.isbn.includes(search))
+    );
     if (catFilter) result = result.filter(b => b.category === catFilter);
+    if (levelFilter) result = result.filter(b => b.level === levelFilter);
     switch (sort) {
         case 'newest': result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); break;
         case 'oldest': result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); break;
@@ -804,24 +727,19 @@ function isValidISBN(code) {
     const c = code.replace(/[-\s]/g, '');
     return /^\d{10}$/.test(c) || /^\d{13}$/.test(c);
 }
-
 function genId() { return 'b_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6); }
-
 function esc(str) {
     if (!str) return '';
     const d = document.createElement('div'); d.textContent = str; return d.innerHTML;
 }
-
 function turkishSlug(s) {
     return s.toLowerCase().replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
 }
-
 function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
 }
-
 function showGlobalLoading(show) {
     document.getElementById('global-loading').style.display = show ? 'flex' : 'none';
 }
