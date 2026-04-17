@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>📚 Kütüphane Yönetim Sistemi</title>
     <link rel="stylesheet" href="style.css">
-    <!-- ZXing - Çok daha güvenilir barkod okuyucu -->
-    <script src="https://unpkg.com/@aspect-build/aspect-build@latest" onerror="true"></script>
     <script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
 </head>
 <body>
@@ -16,7 +14,7 @@
     <div class="sidebar-header">
         <span class="sidebar-logo">📚</span>
         <h2>Kütüphane</h2>
-        <button class="sidebar-close" id="sidebar-close" onclick="closeSidebar()">✕</button>
+        <button class="sidebar-close" onclick="closeSidebar()">✕</button>
     </div>
     <nav class="sidebar-nav">
         <button class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
@@ -36,7 +34,7 @@
         </button>
     </nav>
     <div class="sidebar-footer">
-        <small>Kütüphane Yönetim v3.0</small>
+        <small>Kütüphane Yönetim v3.1</small>
     </div>
 </aside>
 
@@ -48,14 +46,14 @@
 
     <!-- TOP BAR -->
     <header class="topbar">
-        <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
         <h1 id="page-title">Ana Sayfa</h1>
         <div class="topbar-actions">
             <span class="book-count" id="topbar-count">0 Kitap</span>
         </div>
     </header>
 
-    <!-- ====== DASHBOARD ====== -->
+    <!-- ========== DASHBOARD ========== -->
     <section class="page active" id="page-dashboard">
         <div class="stats-grid">
             <div class="stat-card stat-total">
@@ -102,20 +100,14 @@
         <div class="quick-actions">
             <h3>⚡ Hızlı İşlemler</h3>
             <div class="action-buttons">
-                <button class="action-btn" onclick="navigateTo('add-book')">
-                    <span>➕</span> Kitap Ekle
-                </button>
-                <button class="action-btn" onclick="navigateTo('scan-search')">
-                    <span>📷</span> Barkod Tara
-                </button>
-                <button class="action-btn" onclick="navigateTo('categories')">
-                    <span>🏷️</span> Kategori Yönet
-                </button>
+                <button class="action-btn" onclick="navigateTo('add-book')"><span>➕</span> Kitap Ekle</button>
+                <button class="action-btn" onclick="navigateTo('scan-search')"><span>📷</span> Barkod Tara</button>
+                <button class="action-btn" onclick="navigateTo('categories')"><span>🏷️</span> Kategori Yönet</button>
             </div>
         </div>
     </section>
 
-    <!-- ====== KİTAP EKLE ====== -->
+    <!-- ========== KİTAP EKLE ========== -->
     <section class="page" id="page-add-book">
         <div class="form-container">
             <div class="form-header">
@@ -130,16 +122,13 @@
                     <p>ISBN barkodunu tarayarak kitap bilgilerini otomatik doldurun</p>
                 </div>
                 <div class="scan-fill-actions">
-                    <button class="btn btn-accent" onclick="openFormScanner()">
-                        📷 Kamera ile Tara
-                    </button>
+                    <button class="btn btn-accent" onclick="openFormScanner()">📷 Kamera ile Tara</button>
                     <span class="divider-text">veya</span>
                     <div class="isbn-quick-input">
                         <input type="text" id="quick-isbn" placeholder="ISBN girin..." maxlength="13">
                         <button class="btn btn-primary btn-sm" onclick="quickISBNFill()">Doldur</button>
                     </div>
                 </div>
-                <!-- Inline Scanner -->
                 <div id="form-scanner-area" class="inline-scanner-area" style="display:none;">
                     <div class="scanner-box-enhanced">
                         <video id="form-scanner-video" class="scanner-video" playsinline></video>
@@ -153,10 +142,10 @@
                         <div class="scanner-status" id="form-scanner-status">Barkodu çerçeve içine hizalayın</div>
                     </div>
                     <div class="scanner-toolbar">
-                        <button class="tool-btn" onclick="toggleZoom('form', -1)" title="Uzaklaştır">➖</button>
-                        <span class="zoom-label" id="form-zoom-label">0.5x</span>
-                        <button class="tool-btn" onclick="toggleZoom('form', 1)" title="Yakınlaştır">➕</button>
-                        <button class="tool-btn" id="form-torch-btn" onclick="toggleTorch('form')" title="Fener">🔦</button>
+                        <button class="tool-btn" onclick="toggleZoom('form',-1)">➖</button>
+                        <span class="zoom-label" id="form-zoom-label">1.0x</span>
+                        <button class="tool-btn" onclick="toggleZoom('form',1)">➕</button>
+                        <button class="tool-btn" id="form-torch-btn" onclick="toggleTorch('form')">🔦</button>
                         <button class="tool-btn tool-close" onclick="closeFormScanner()">⏹ Kapat</button>
                     </div>
                 </div>
@@ -164,7 +153,6 @@
 
             <form id="book-form" onsubmit="return saveBook(event)">
                 <input type="hidden" id="book-id" value="">
-
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label for="book-name">📖 Kitap Adı *</label>
@@ -189,6 +177,19 @@
                         <input type="number" id="book-year" placeholder="Örn: 2023" min="1000" max="2099">
                     </div>
                     <div class="form-group">
+                        <label for="book-level">🎓 Eğitim Seviyesi</label>
+                        <select id="book-level">
+                            <option value="">Seçiniz (opsiyonel)</option>
+                            <option value="okul-oncesi">💒 Okul Öncesi</option>
+                            <option value="ilkokul">🏫 İlkokul (1-4. Sınıf)</option>
+                            <option value="ortaokul">📐 Ortaokul (5-8. Sınıf)</option>
+                            <option value="lise">🎒 Lise (9-12. Sınıf)</option>
+                            <option value="universite">🎓 Üniversite</option>
+                            <option value="yetiskin">📚 Yetişkin</option>
+                            <option value="genel">🌐 Her Seviye</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="book-publisher-field">🏢 Yayınevi</label>
                         <input type="text" id="book-publisher-field" placeholder="Yayınevi adı">
                     </div>
@@ -205,7 +206,6 @@
                         <input type="url" id="book-cover-url" placeholder="https://... (opsiyonel)">
                     </div>
                 </div>
-
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary btn-lg" id="form-submit-btn">💾 Kitabı Kaydet</button>
                     <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">🔄 Temizle</button>
@@ -214,7 +214,7 @@
         </div>
     </section>
 
-    <!-- ====== KİTAPLAR LİSTESİ ====== -->
+    <!-- ========== KİTAPLAR ========== -->
     <section class="page" id="page-books">
         <div class="books-toolbar">
             <div class="search-box">
@@ -225,6 +225,16 @@
             <div class="filter-row">
                 <select id="filter-category" onchange="filterBooks()">
                     <option value="">Tüm Kategoriler</option>
+                </select>
+                <select id="filter-level" onchange="filterBooks()">
+                    <option value="">Tüm Seviyeler</option>
+                    <option value="okul-oncesi">💒 Okul Öncesi</option>
+                    <option value="ilkokul">🏫 İlkokul</option>
+                    <option value="ortaokul">📐 Ortaokul</option>
+                    <option value="lise">🎒 Lise</option>
+                    <option value="universite">🎓 Üniversite</option>
+                    <option value="yetiskin">📚 Yetişkin</option>
+                    <option value="genel">🌐 Her Seviye</option>
                 </select>
                 <select id="sort-select" onchange="filterBooks()">
                     <option value="newest">En Yeni</option>
@@ -240,7 +250,6 @@
             </div>
         </div>
 
-        <!-- Search Scanner Inline -->
         <div id="search-scanner-area" class="inline-scanner-area" style="display:none;">
             <div class="scanner-box-enhanced">
                 <video id="search-scanner-video" class="scanner-video" playsinline></video>
@@ -254,9 +263,9 @@
                 <div class="scanner-status" id="search-scanner-status">Barkodu çerçeve içine hizalayın</div>
             </div>
             <div class="scanner-toolbar">
-                <button class="tool-btn" onclick="toggleZoom('search', -1)">➖</button>
+                <button class="tool-btn" onclick="toggleZoom('search',-1)">➖</button>
                 <span class="zoom-label" id="search-zoom-label">1.0x</span>
-                <button class="tool-btn" onclick="toggleZoom('search', 1)">➕</button>
+                <button class="tool-btn" onclick="toggleZoom('search',1)">➕</button>
                 <button class="tool-btn" id="search-torch-btn" onclick="toggleTorch('search')">🔦</button>
                 <button class="tool-btn tool-close" onclick="closeSearchScanner()">⏹ Kapat</button>
             </div>
@@ -269,7 +278,7 @@
         </div>
     </section>
 
-    <!-- ====== BARKOD TARA / ARA ====== -->
+    <!-- ========== BARKOD TARA / ARA ========== -->
     <section class="page" id="page-scan-search">
         <div class="scan-search-container">
             <div class="scan-section">
@@ -284,7 +293,6 @@
                         <li>Telefonu sabit tutun</li>
                     </ul>
                 </div>
-
                 <div class="scanner-wrapper-main">
                     <div class="scanner-box-enhanced scanner-large">
                         <video id="main-scanner-video" class="scanner-video" playsinline></video>
@@ -302,22 +310,17 @@
                         </div>
                     </div>
                     <div class="scanner-toolbar" id="main-scanner-toolbar" style="display:none;">
-                        <button class="tool-btn" onclick="toggleZoom('main', -1)">➖</button>
+                        <button class="tool-btn" onclick="toggleZoom('main',-1)">➖</button>
                         <span class="zoom-label" id="main-zoom-label">1.0x</span>
-                        <button class="tool-btn" onclick="toggleZoom('main', 1)">➕</button>
+                        <button class="tool-btn" onclick="toggleZoom('main',1)">➕</button>
                         <button class="tool-btn" id="main-torch-btn" onclick="toggleTorch('main')">🔦</button>
                         <button class="tool-btn" onclick="switchCamera('main')">🔄</button>
                     </div>
                     <div class="scanner-controls">
-                        <button id="main-start-btn" class="btn btn-primary btn-lg" onclick="startMainScanner()">
-                            ▶️ Taramayı Başlat
-                        </button>
-                        <button id="main-stop-btn" class="btn btn-danger btn-lg" onclick="stopMainScanner()" style="display:none;">
-                            ⏹️ Durdur
-                        </button>
+                        <button id="main-start-btn" class="btn btn-primary btn-lg" onclick="startMainScanner()">▶️ Taramayı Başlat</button>
+                        <button id="main-stop-btn" class="btn btn-danger btn-lg" onclick="stopMainScanner()" style="display:none;">⏹️ Durdur</button>
                     </div>
                 </div>
-
                 <div id="scan-result-area" class="scan-result-area" style="display:none;">
                     <div class="scan-result-isbn">
                         <span class="label">✅ Tespit Edilen ISBN:</span>
@@ -331,7 +334,7 @@
         </div>
     </section>
 
-    <!-- ====== KATEGORİLER ====== -->
+    <!-- ========== KATEGORİLER ========== -->
     <section class="page" id="page-categories">
         <div class="categories-container">
             <div class="section-card">
